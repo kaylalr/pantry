@@ -1,0 +1,18 @@
+{
+  "name": "pantry",
+  "version": "1.0.0",
+  "description": "An application to track what food you have in your pantry",
+  "main": "server.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "Kayla Hellbusch",
+  "license": "ISC",
+  "dependencies": {
+    "body-parser": "^1.18.3",
+    "client-sessions": "^0.8.0",
+    "ejs": "^2.6.1",
+    "express": "^4.16.4",
+    "pg": "^7.8.2"
+  }
+}
