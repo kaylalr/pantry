@@ -1,0 +1,6 @@
+/***********************************   LARGE SCREEN MEDIA QUERY   ***********************************/
+@media screen and (min-width: 992px) {
+    .padding-top {
+        padding-top: 150px;
+    }
+}

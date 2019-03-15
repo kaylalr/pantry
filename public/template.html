@@ -1,55 +1,3 @@
-<!-- <!DOCTYPE html>
-<html lang="en">
-
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta http-equiv="X-UA-Compatible" content="ie=edge">
-    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u"
-        crossorigin="anonymous">
-    <title>Add Food</title>
-    <style>
-        #addFoodForm {
-            max-width: 600px;
-            margin: 0 auto;
-            margin-top: 100px;
-        }
-    </style>
-</head>
-
-<body>
-    <h1>Add Food</h1>
-    <form id="addFoodForm" action="/addFood" method="post">
-        <div class="form-group">
-            <label for="food_name">Food Name</label>
-            <input type="email" class="form-control" id="food_name" name="food_name" placeholder="Enter food name">
-        </div>
-        <div class="form-group">
-            <label for="quantity_num">Quantity</label>
-            <input type="number" class="form-control" id="quantity_num" name="quantity_num" placeholder="number">
-        </div>
-        <div class="form-group">
-            <label for="quantity_type_id">Quantity Type</label>
-            <select class="form-control">
-                <option>1</option>
-                <option>2</option>
-                <option>3</option>
-            </select>
-        </div>
-        <div class="form-group">
-            <label for="expiration">Expiration Date</label>
-            <input type="date" class="form-control" id="expiration" name="expiration">
-        </div>
-        <div class="form-group">
-            <label for="description">Description</label>
-            <input type="text" class="form-control" id="description" name="description">
-        </div>
-        <button type="submit" class="btn btn-primary">Add Food</button>
-    </form>
-</body>
-
-</html> -->
-
 <!DOCTYPE html>
 <html lang="en">
 
@@ -118,44 +66,11 @@
   <!-- Add Food -->
   <section class="addFood padding-top" id="addFood">
     <div class="container">
-      <h2 class="text-center text-uppercase text-secondary mb-0">Add Food</h2>
+      <h2 class="text-center text-uppercase text-secondary mb-0">Heading</h2>
       <hr class="star-dark mb-5">
-      <form id="addFoodForm" action="/addFood" method="post">
-        <div class="form-group">
-          <label for="food_name">Food Name</label>
-          <input type="text" class="form-control" id="food_name" name="food_name" placeholder="food name">
-        </div>
-        <div class="form-group">
-          <label for="quantity_type_id">Food Type</label>
-          <select class="form-control" name="food_type">
-              <% food_groups.forEach(function(type) { %>
-                <option value="<%= type.foodgroup_id%>"><%= type.foodgroup_name%></option> 
-              <% }) %>
-          </select>
-        </div>
-        <div class="form-group">
-          <label for="quantity_num">Quantity</label>
-          <input type="number" class="form-control" id="quantity_num" name="quantity_num" placeholder="quantity">
-        </div>
-        <div class="form-group">
-          <label for="quantity_type_id">Quantity Type</label>
-          <select class="form-control" name="quantity_type">
-              <% quantity_types.forEach(function(type) { %>
-                <option value="<%= type.quantity_type_id%>"><%= type.quantity_type_name%></option> 
-              <% }) %>
-          </select>
-          
-        </div>
-        <div class="form-group">
-          <label for="expiration">Expiration Date</label>
-          <input type="date" class="form-control" id="expiration" name="expiration">
-        </div>
-        <div class="form-group">
-          <label for="description">Description</label>
-          <input type="text" class="form-control" id="description" name="description" placeholder="description">
-        </div>
-        <button type="submit" class="btn btn-primary">Add Food</button>
-      </form>
+
+<!-- *************** ADD CONTENT HERE ***************-->
+
     </div>
   </section>
 

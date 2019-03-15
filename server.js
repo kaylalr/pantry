@@ -23,6 +23,11 @@ app.use(session({
 //   app.use(bodyParser);
 
 app.use(express.static('bootstrap'));
+app.use(express.static('public'));
+/* these two allow you to get data from
+*  the body on a post     */
+app.use(express.json());
+app.use(express.urlencoded());
 
 // tell express where your views are going to be
 app.set("views", "views");
@@ -57,26 +62,51 @@ app.post("/login", function (req, res) {
 app.get("/food", function (req, res) {
     // ??? is this the best way to do this?  look at the getAllFoods function
     getAllFoods(function (result) {
-        console.log("food DB result: ")
-        console.log(result);
+        // console.log("food DB result: ")
+        // console.log(result);
         const params = {
-            result: result
+            foods: result
         };
         console.log(params);
         // for(i=0; i<result.length; i++) {
         // console.log("result " + i + ":");
         // console.log(result[i]);
         // }
-        res.render('food', params);
+        res.render("food", params);
     })
 });
 
 
 app.get("/addFood", function (req, res) {
-    res.render("addFood");
+    getQuantityTypes(function (result1) {
+        getFoodGroups(function (result2) {
+            const params = {
+                quantity_types: result1,
+                food_groups: result2
+            };
+            console.log(params);
+            res.render("addFood", params);
+        })
+        
+    })
 })
 app.post("/addFood", function (req, res) {
-    // ??? how do I get the values from the form
+    let food_name = req.body.food_name;
+    let food_type = req.body.food_type;
+    let quantity_num = req.body.quantity_num;
+    let quantity_type = req.body.quantity_type;
+    let expiration = req.body.expiration;
+    let description = req.body.description;
+
+    // console.log("food_name: "+food_name+", food_type: "+food_type+", quantity_num: "+quantity_num+", quantity_type: "+quantity_type+", expiration: "+expiration+", description: "+description);
+    var insertSQL = "INSERT INTO foods values (default,$1,1,$2,$3,$4,$5,$6)";
+    pool.query(insertSQL, [food_name, food_type, quantity_num, quantity_type, expiration, description], function (err, result) {
+        // If an error occurred...
+        if (err) {
+            console.log("Error in query: ")
+            console.log(err);
+        }
+    })
 })
 
 app.get("/bootstrap", function (req, res) {
@@ -84,16 +114,37 @@ app.get("/bootstrap", function (req, res) {
 })
 
 function getAllFoods(callback) {
-    var getAllFoods = "SELECT * FROM foods";
+    // var getAllFoods = "SELECT * FROM foods";
+    var getAllFoods = "select f.food_name, f.foodgroup_id, f.quantity_num, f.expiration, qt.quantity_type_name FROM foods f JOIN quantity_types qt ON qt.quantity_type_id = f.quantity_type_id;"
     pool.query(getAllFoods, function (err, result) {
         if (err) {
             console.log("Error in query: ")
             console.log(err)
         }
-
         callback(result.rows);
     })
+}
 
+function getQuantityTypes(callback) {
+    var getQuantityTypes = "SELECT * FROM quantity_types";
+    pool.query(getQuantityTypes, function (err, result) {
+        if (err) {
+            console.log("Error in query: ")
+            console.log(err)
+        }
+        callback(result.rows);
+    })
+}
+
+function getFoodGroups(callback) {
+    var getQuantityTypes = "SELECT * FROM food_groups";
+    pool.query(getQuantityTypes, function (err, result) {
+        if (err) {
+            console.log("Error in query: ")
+            console.log(err)
+        }
+        callback(result.rows);
+    })
 }
 
 // app.get("/getPerson", function (req, res) {
