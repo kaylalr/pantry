@@ -3,7 +3,7 @@ const app = express();
 const url = require('url');
 const PORT = process.env.PORT || 5000;
 const session = require('express-session');
-const loggedin;
+let loggedin;
 // const bodyParser = require('body-parser');
 
 const {
