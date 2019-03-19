@@ -1,0 +1,47 @@
+/***********************************          ALL SCREENS         ***********************************/
+.food-content {
+    .row:nth-child(even) {
+        background-color: #f2f2f2;
+    }
+}
+.food-buttons {
+    div {
+        width: 150px;
+        .delete-button {
+            margin-left: 10px;
+        }
+        padding: 15px 0px;
+    }
+}
+.flex-row {
+    display: flex;
+    flex-flow: row wrap;
+    height: 70px;
+    align-content: center;
+    justify-content: space-between;
+    h4, p {
+        margin-bottom: 0px;
+    }
+}
+.width-100 {
+    width: 100%;
+}
+.warning {
+    color: red;
+    padding: 15px;
+}
+
+/***********************************   LARGE SCREEN MEDIA QUERY   ***********************************/
+@media screen and (min-width: 992px) {
+    .padding-top {
+        padding-top: 150px;
+    }
+    .food-buttons {
+        div {
+            float:right
+        }
+    }
+    .width-100 {
+        display: none;
+    }
+}

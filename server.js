@@ -14,13 +14,14 @@ const pool = new Pool({
     connectionString: connectionString
 });
 
+const db = require('./model/databaseConnect.js');
+
 app.use(session({
     cookieName: 'session',
     secret: 'thisisarandomstringandihavenoideawhyineedit',
     duration: 30 * 60 * 1000,
     activeDuration: 5 * 60 * 1000,
 }));
-//   app.use(bodyParser);
 
 app.use(express.static('bootstrap'));
 app.use(express.static('public'));
@@ -34,19 +35,6 @@ app.set("views", "views");
 // telling express you are using ejs
 app.set("view engine", "ejs");
 
-// var sql = "SELECT * FROM users";
-
-// pool.query(sql, function (err, result) {
-//     // If an error occurred...
-//     if (err) {
-//         console.log("Error in query: ")
-//         console.log(err);
-//     }
-
-//     // Log this to the console for debugging purposes.
-//     console.log("Back from DB with result:");
-//     console.log(result.rows);
-// });
 
 app.get("/", function (req, res) {
     res.render('index');
@@ -55,13 +43,26 @@ app.get("/login", function (req, res) {
     res.render('login');
 });
 app.post("/login", function (req, res) {
-    // console.log("res.body.username: "+req.body.username);
-    //res.render('');
+    let username = req.body.username;
+    let password = req.body.password;
+    let variables = {
+        username: username,
+        password: password
+    }
+    db.verifyUser(variables, function (result) {
+        if (result.length < 1) {
+            let message = "Please check your username and password."
+            let params = {
+                message: message
+            }
+            res.render('login', params);
+        }
+        console.log(result);
+    })
 });
-
 app.get("/food", function (req, res) {
     // ??? is this the best way to do this?  look at the getAllFoods function
-    getAllFoods(function (result) {
+    db.getAllFoods(function (result) {
         const params = {
             foods: result
         };
@@ -69,11 +70,9 @@ app.get("/food", function (req, res) {
         res.render("food", params);
     })
 });
-
-
 app.get("/addFood", function (req, res) {
-    getQuantityTypes(function (result1) {
-        getFoodGroups(function (result2) {
+    db.getQuantityTypes(function (result1) {
+        db.getFoodGroups(function (result2) {
             const params = {
                 quantity_types: result1,
                 food_groups: result2
@@ -96,16 +95,16 @@ app.post("/addFood", function (req, res) {
     pool.query(insertSQL, [food_name, food_type, quantity_num, quantity_type, expiration, description], function (err, result) {
         // If an error occurred...
         if (err) {
-            console.log("Error in query: ")
+            console.log("Error in addFood query: ")
             console.log(err);
         }
     })
 });
 app.get("/edit/:id", function (req, res) {
     let id = req.params.id;
-    getQuantityTypes(function (result1) {
-        getFoodGroups(function (result2) {
-            getFoodById(id, function (result3) {
+    db.getQuantityTypes(function (result1) {
+        db.getFoodGroups(function (result2) {
+            db.getFoodById(id, function (result3) {
                 const params = {
                     food: result3[0],
                     quantity_types: result1,
@@ -116,73 +115,37 @@ app.get("/edit/:id", function (req, res) {
             })
         })
     })
-})
+});
+// SHOULD THIS BE A PUT? HOW DO YOU DO THAT?
 app.post("/edit/:id", function (req, res) {
+    // WHAT IF SOMEONE CHANGED THE ID AND THEN SUBMITTED THE FORM?
     let id = req.params.id;
-    // WRITE FUNCTION TO UPDATE DATABASE
-})
+    let food_name = req.body.food_name;
+    let food_type = req.body.food_type;
+    let quantity_num = req.body.quantity_num;
+    let quantity_type = req.body.quantity_type;
+    let expiration = req.body.expiration;
+    let description = req.body.description;
 
-app.get("/bootstrap", function (req, res) {
-    res.render("index-new");
-})
+    // console.log("post edit id: " + id);
 
-function getFoodById(id, callback) {
-    var getFoodById = "SELECT * FROM foods WHERE food_id = $1";
-    pool.query(getFoodById, [id], function (err, result) {
+    var updateFoodSQL = "UPDATE foods SET food_name = $1, foodgroup_id = $2, quantity_num = $3, quantity_type_id = $4, expiration = $5, description = $6 WHERE food_id = $7";
+    pool.query(updateFoodSQL, [food_name, food_type, quantity_num, quantity_type, expiration, description, id], function (err, result) {
         if (err) {
-            console.log("Error in query: ")
+            console.log("Error in update food query: ")
             console.log(err);
         }
-        let year = result.rows[0].expiration.getFullYear();
-        let month = result.rows[0].expiration.getMonth();
-        console.log("month length: " + month.length);
-        if (month.toString().length == 1) {
-            month = "0"+month;
-        }
-        let day = result.rows[0].expiration.getDate();
-        if (day.toString().length == 1) {
-            day = "0"+day;
-        }
-        let date = year + "-" + month + "-" + day;
-        result.rows[0].expiration = date;
-        callback(result.rows);
+        // how to re-route to /food - I think this works.
+        res.redirect("/food");
     })
-}
-
-function getAllFoods(callback) {
-    // var getAllFoods = "SELECT * FROM foods";
-    var getAllFoods = "select f.food_id, f.food_name, f.foodgroup_id, f.quantity_num, f.expiration, qt.quantity_type_name FROM foods f JOIN quantity_types qt ON qt.quantity_type_id = f.quantity_type_id;"
-    pool.query(getAllFoods, function (err, result) {
-        if (err) {
-            console.log("Error in query: ")
-            console.log(err)
-        }
-        callback(result.rows);
+})
+app.delete("/delete/:id", function (req, res) {
+    let id = req.params.id;
+    // console.log("delete " + id);
+    db.deleteFood(id, function () {
+        // res.redirect("/food");
     })
-}
-
-function getQuantityTypes(callback) {
-    var getQuantityTypes = "SELECT * FROM quantity_types";
-    pool.query(getQuantityTypes, function (err, result) {
-        if (err) {
-            console.log("Error in query: ")
-            console.log(err)
-        }
-        callback(result.rows);
-    })
-}
-
-function getFoodGroups(callback) {
-    var getQuantityTypes = "SELECT * FROM food_groups";
-    pool.query(getQuantityTypes, function (err, result) {
-        if (err) {
-            console.log("Error in query: ")
-            console.log(err)
-        }
-        callback(result.rows);
-    })
-}
-
+})
 app.listen(PORT, function () {
     console.log("Server is running...");
 });
