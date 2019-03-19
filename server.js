@@ -2,7 +2,8 @@ const express = require('express');
 const app = express();
 const url = require('url');
 const PORT = process.env.PORT || 5000;
-var session = require('client-sessions');
+const session = require('express-session');
+const loggedin;
 // const bodyParser = require('body-parser');
 
 const {
@@ -15,13 +16,35 @@ const pool = new Pool({
 });
 
 const db = require('./model/databaseConnect.js');
+const f = require('./functions/functions.js');
 
 app.use(session({
-    cookieName: 'session',
+    // cookieName: 'session',
+    key: 'user_sid',
     secret: 'thisisarandomstringandihavenoideawhyineedit',
     duration: 30 * 60 * 1000,
     activeDuration: 5 * 60 * 1000,
+    cookie: {
+        expires: 600000
+    }
 }));
+// This middleware will check if user's cookie is still saved in browser and user is not set, then automatically log the user out.
+// This usually happens when you stop your express server after login, your cookie still remains saved in the browser.
+// app.use((req, res, next) => {
+//     if (req.cookies.user_sid && !req.session.user) {
+//         res.clearCookie('user_sid');        
+//     }
+//     next();
+// })
+
+// middleware function to check for logged-in users
+// var sessionChecker = (req, res, next) => {
+//     if (req.session.user && req.cookies.user_sid) {
+//         res.redirect('/food');
+//     } else {
+//         next();
+//     }    
+// };
 
 app.use(express.static('bootstrap'));
 app.use(express.static('public'));
@@ -50,14 +73,25 @@ app.post("/login", function (req, res) {
         password: password
     }
     db.verifyUser(variables, function (result) {
-        if (result.length < 1) {
+        if (result.length != 1) {
             let message = "Please check your username and password."
             let params = {
                 message: message
             }
             res.render('login', params);
         }
-        console.log(result);
+        let checkPass = f.checkPassword(result[0], password);
+        if (!checkPass) {
+            let message = "Please check your username and password."
+            let params = {
+                message: message
+            }
+            res.render('login', params);
+        } else {
+            req.session.user = result[0];
+            // console.log("session username: " + req.session.user.user_name);
+            res.redirect("/food");
+        }
     })
 });
 app.get("/food", function (req, res) {
@@ -66,7 +100,7 @@ app.get("/food", function (req, res) {
         const params = {
             foods: result
         };
-        console.log(params);
+        // console.log(params);
         res.render("food", params);
     })
 });
@@ -143,6 +177,7 @@ app.delete("/delete/:id", function (req, res) {
     let id = req.params.id;
     // console.log("delete " + id);
     db.deleteFood(id, function () {
+        // WHY DOESN'T THIS WORK??
         // res.redirect("/food");
     })
 })
