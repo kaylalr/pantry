@@ -72,7 +72,6 @@
         </div>
         <div class="form-group">
           <label for="expiration">Expiration Date</label>
-          <!-- NEED TO SET THE VALUE OF THE EXPIRATION DATE -->
           <input type="date" class="form-control" id="expiration" name="expiration" value="<%= food.expiration%>">
         </div>
         <div class="form-group">
@@ -81,6 +80,7 @@
         </div>
         <input type="hidden" value="<%= food.user_id%>">
         <button type="submit" class="btn btn-primary">Done</button>
+        <a href="/food"><button type="button" class="btn btn-danger">Cancel</button></a>
       </form>
     </div>
   </section>
