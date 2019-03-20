@@ -2,6 +2,9 @@
 .food-content .row:nth-child(even) {
   background-color: #f2f2f2;
 }
+.food-content .food-name-expiration a {
+  color: black;
+}
 .food-content .quantity {
   display: flex;
   flex-flow: column;
@@ -58,6 +61,10 @@
   display: none;
 }
 
+.show-small {
+  display: initial;
+}
+
 .warning {
   color: red;
   padding: 15px;
@@ -85,6 +92,10 @@
   .hide-small {
     display: initial;
   }
+
+  .show-small {
+    display: none;
+  }
 }
 /*************************************************   LARGE SCREEN MEDIA QUERY   *************************************************/
 @media screen and (min-width: 992px) {
@@ -94,7 +105,7 @@
 
   .food-content .food-name-expiration {
     display: flex;
-    width: 30vw;
+    width: 60%;
     justify-content: space-between;
   }
 }
