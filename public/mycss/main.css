@@ -38,7 +38,7 @@
 .flex-row {
   display: flex;
   flex-flow: row nowrap;
-  height: 70px;
+  height: 100px;
   align-items: center;
   justify-content: space-between;
   max-width: 100%;
@@ -75,6 +75,7 @@
   .flex-row {
     max-width: 66.6667%;
     flex: 0 0 66.6667%;
+    height: 70px;
   }
 
   .width-100 {
@@ -89,6 +90,12 @@
 @media screen and (min-width: 992px) {
   .padding-top {
     padding-top: 150px;
+  }
+
+  .food-content .food-name-expiration {
+    display: flex;
+    width: 30vw;
+    justify-content: space-between;
   }
 }
 

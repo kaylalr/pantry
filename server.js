@@ -166,7 +166,7 @@ app.get("/edit/:id", function (req, res) {
                     quantity_types: result1,
                     food_groups: result2
                 };
-                console.log(params);
+                // console.log(params);
                 res.render("editFood", params);
             })
         })

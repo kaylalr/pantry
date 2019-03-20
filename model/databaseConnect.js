@@ -13,6 +13,15 @@ function getAllFoods(callback) {
             console.log("Error in getAllFoods query: ")
             console.log(err)
         }
+        result.rows.forEach(row => {
+            let year = row.expiration.getFullYear();
+            let month = row.expiration.getMonth() + 1;
+            let day = row.expiration.getDate();
+            let myDate = new Date(year, (month-1), day);
+            let myMonth = myDate.toLocaleString('en-us', { month: 'long' });
+            let date = myMonth + " " + day + ", " + year;
+            row.expiration = date;
+        })
         callback(result.rows);
     })
 }
@@ -24,16 +33,14 @@ function getFoodById(id, callback) {
             console.log("Error in getFoodById query: ")
             console.log(err);
         }
-        console.log(result.rows[0].expiration);
         let year = result.rows[0].expiration.getFullYear();
-        let month = result.rows[0].expiration.getMonth()+1;
-        console.log(month);
+        let month = result.rows[0].expiration.getMonth() + 1;
         if (month.toString().length == 1) {
-            month = "0"+month;
+            month = "0" + month;
         }
         let day = result.rows[0].expiration.getDate();
         if (day.toString().length == 1) {
-            day = "0"+day;
+            day = "0" + day;
         }
         let date = year + "-" + month + "-" + day;
         result.rows[0].expiration = date;
@@ -76,7 +83,7 @@ function getFoodGroups(callback) {
 
 function deleteFood(id, callback) {
     var deleteFood = "DELETE FROM foods WHERE food_id = $1";
-    pool.query(deleteFood, [id], function(err, result) {
+    pool.query(deleteFood, [id], function (err, result) {
         if (err) {
             console.log("Error in deleteFood query: ")
             console.log(err)
@@ -87,7 +94,7 @@ function deleteFood(id, callback) {
 
 function verifyUser(variables, callback) {
     var checkUser = "SELECT * from users WHERE user_name = $1";
-    pool.query(checkUser, [variables.username], function(err, result) {
+    pool.query(checkUser, [variables.username], function (err, result) {
         if (err) {
             console.log("Error in checkUser query: ")
             console.log(err)
@@ -103,5 +110,6 @@ module.exports = {
     getFoodGroups: getFoodGroups,
     deleteFood: deleteFood,
     verifyUser: verifyUser,
-    updateQuantity, updateQuantity
+    updateQuantity,
+    updateQuantity
 }
