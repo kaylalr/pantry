@@ -3,7 +3,7 @@ const app = express();
 const url = require('url');
 const PORT = process.env.PORT || 5000;
 const session = require('express-session');
-let loggedin;
+let stayLoggedin = true;
 // const bodyParser = require('body-parser');
 
 const {
@@ -45,6 +45,13 @@ app.use(session({
 //         next();
 //     }    
 // };
+app.use(function (req, res, next) {
+
+    res.locals.user = req.session.user;
+    res.locals.loggedin = stayLoggedin;
+    // res.locals.authenticated = ! req.user.anonymous;
+    next();
+});
 
 app.use(express.static('bootstrap'));
 app.use(express.static('public'));
@@ -60,6 +67,8 @@ app.set("view engine", "ejs");
 
 
 app.get("/", function (req, res) {
+    // console.log(req.session.user)
+
     res.render('index');
 });
 app.get("/login", function (req, res) {
@@ -95,6 +104,9 @@ app.post("/login", function (req, res) {
     })
 });
 app.get("/food", function (req, res) {
+    if (req.session.user == 'undefined' || req.session.user == null && stayLoggedin == false) {
+        res.redirect("/");
+    }
     // ??? is this the best way to do this?  look at the getAllFoods function
     db.getAllFoods(function (result) {
         const params = {
@@ -104,7 +116,15 @@ app.get("/food", function (req, res) {
         res.render("food", params);
     })
 });
+app.post("/food/:id/:quantity", function (req, res) {
+    let id = req.params.id;
+    let quantity = req.params.quantity;
+    db.updateQuantity(id, quantity);
+})
 app.get("/addFood", function (req, res) {
+    if (req.session.user == 'undefined' || req.session.user == null && stayLoggedin == false) {
+        res.redirect("/");
+    }
     db.getQuantityTypes(function (result1) {
         db.getFoodGroups(function (result2) {
             const params = {
@@ -135,6 +155,9 @@ app.post("/addFood", function (req, res) {
     })
 });
 app.get("/edit/:id", function (req, res) {
+    if (req.session.user == 'undefined' || req.session.user == null && stayLoggedin == false) {
+        res.redirect("/");
+    }
     let id = req.params.id;
     db.getQuantityTypes(function (result1) {
         db.getFoodGroups(function (result2) {

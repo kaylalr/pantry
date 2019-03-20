@@ -41,6 +41,16 @@ function getFoodById(id, callback) {
     })
 }
 
+function updateQuantity(id, quantity) {
+    var updateQuantity = "UPDATE foods SET quantity_num = $1 WHERE food_id = $2";
+    pool.query(updateQuantity, [quantity, id], function (err, result) {
+        if (err) {
+            console.log("Error in updateQuantity query: ")
+            console.log(err)
+        }
+    })
+}
+
 function getQuantityTypes(callback) {
     var getQuantityTypes = "SELECT * FROM quantity_types";
     pool.query(getQuantityTypes, function (err, result) {
@@ -91,5 +101,6 @@ module.exports = {
     getQuantityTypes: getQuantityTypes,
     getFoodGroups: getFoodGroups,
     deleteFood: deleteFood,
-    verifyUser: verifyUser
+    verifyUser: verifyUser,
+    updateQuantity, updateQuantity
 }

@@ -44,18 +44,29 @@
       <div class="container food-content">
         <% foods.forEach(function(food) { %>
         <div class="row">
-          <div class="col-8 flex-row">
-            <h4>
+          <div class="col-8 col-sm-12 flex-row">
+            <h4 class="food_name">
               <%= food.food_name %>
             </h4>
-            <p>
-              <%= food.quantity_num %>
-              <%= food.quantity_type_name %>
-            </p>
+            <div class="quantity">
+              <div>
+                <h5 id="<%= food.food_id%>-quantity">
+                  <%= food.quantity_num %>
+                </h5>
+                <p>
+                  <%= food.quantity_type_name %>
+                </p>
+              </div>
+              <div>
+                <button onclick="setFood('<%= food.food_id%>', '<%= food.quantity_num %>')" class="btn btn-primary add-food">+</button>
+                <button onclick="setFood('<%= food.food_id%>', '<%= food.quantity_num %>')" class="btn btn-danger subtract-food">-</button>
+              </div>
+            </div>
+
           </div>
           <!-- this is to force the columns to wrap on a small screen -->
           <dvi class="width-100"></dvi>
-          <div class="col-4 food-buttons">
+          <div class="col-4 food-buttons hide-small">
             <div>
               <a href="/edit/<%= food.food_id%>"><button type="button" class="btn btn-secondary">Edit</button></a>
               <a href="#"><button type="button" onclick="setInfo('<%= food.food_id %>')" class="btn btn-danger delete-button">Delete</button></a>
@@ -108,10 +119,20 @@
 
   <script>
     var foodId;
+    var foodAddSub;
+    var currentQuantity;
+    var timer;
 
     function setInfo(id) {
       foodId = id;
       console.log("set foodId: " + foodId)
+    }
+
+    function setFood(id, quantity) {
+      foodAddSub = id;
+      if (currentQuantity == null) {
+        currentQuantity = quantity;
+      }
     }
     $(document).ready(function () {
       $(".delete-button").click(function () {
@@ -121,19 +142,47 @@
         var xhttp = new XMLHttpRequest();
         xhttp.onreadystatechange = function () {
           if (this.readyState == 4 && this.status == 200) {
-            // document.getElementById("showJSON").innerHTML = this.responseText;
             $("#myModal").modal("hide");
           }
         };
-        // console.log("foodId: " + foodId)
-        xhttp.open("DELETE", "/delete/"+foodId, true);
+        xhttp.open("DELETE", "/delete/" + foodId, true);
         xhttp.send();
-        
+
       })
+      // ADD SOMETHING TO CHECK IF THE QUANTITY IS ZERO, IF IT IS, THEN ASK IF THEY WANT TO DELETE THE ITEM
+      $(".add-food").click(function () {
+        id = foodAddSub + "-quantity";
+        console.log(id);
+        currentQuantity = +currentQuantity + 1;
+        document.getElementById(id).innerHTML = currentQuantity;
+        if (typeof timer != 'undefined') {
+          clearTimeout(timer);
+        }
+        timer = setTimeout(updateDatabase(), 2000);
+      });
+      $(".subtract-food").click(function () {
+        id = foodAddSub + "-quantity";
+        console.log(id);
+        currentQuantity = +currentQuantity - 1;
+        document.getElementById(id).innerHTML = currentQuantity;
+        if (typeof timer != 'undefined') {
+          clearTimeout(timer);
+        }
+        timer = setTimeout(updateDatabase(), 2000);
+      });
+
     });
-    // function openModal(name) {
-    //   document.getElementById('myModal').modal();
-    // }
+
+    let width = $(window).width();
+    if (width < 756) {
+        $(".row")
+      }
+
+    function updateDatabase() {
+      var xhttp = new XMLHttpRequest();
+      xhttp.open("POST", "/food/" + foodAddSub + "/" + currentQuantity, true);
+      xhttp.send();
+    }
   </script>
 
 </body>
