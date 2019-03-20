@@ -151,6 +151,7 @@ app.post("/addFood", function (req, res) {
             console.log("Error in addFood query: ")
             console.log(err);
         }
+        res.redirect("/food");
     })
 });
 app.get("/edit/:id", function (req, res) {
