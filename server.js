@@ -112,7 +112,6 @@ app.get("/food", function (req, res) {
         const params = {
             foods: result
         };
-        // console.log(params);
         res.render("food", params);
     })
 });
@@ -131,7 +130,7 @@ app.get("/addFood", function (req, res) {
                 quantity_types: result1,
                 food_groups: result2
             };
-            console.log(params);
+            // console.log(params);
             res.render("addFood", params);
         })
 

@@ -48,6 +48,7 @@ function updateQuantity(id, quantity) {
             console.log("Error in updateQuantity query: ")
             console.log(err)
         }
+        // console.log(result);
     })
 }
 
