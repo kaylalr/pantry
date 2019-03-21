@@ -47,11 +47,15 @@
         <% foods.forEach(function(food) { %>
         <div class="row">
           <div class="col-8 col-sm-12 flex-row">
+            <% if(today == food.expiration || today > food.expiration) {%>
+            <div class="food-name-expiration expiring">
+              <% } else {%>
             <div class="food-name-expiration">
-              <h4 class="no-link">
+                <% }%>
+              <h4 class="no-link hide-small">
                 <%= food.food_name %>
               </h4>
-              <h4 class="link"><a href="/edit/<%= food.food_id%>">
+              <h4 class="link show-small"><a href="/edit/<%= food.food_id%>">
                 <%= food.food_name %>
               </h4></a>
               <p>
@@ -182,27 +186,6 @@
         }
       });
     });
-
-    let width = $(window).width();
-    if (width < 756) {
-      // var $data = $(".row").wrap('<a href="#"></a>');
-      // let foodIds = [];
-      // foods.forEach(food => {
-      //   foodIds.push(food.food_id);
-      // })
-      // i = -1;
-      // $(".begin-row").before("<a href='/edit/" + foodIds[i++] + "'>");
-      // $(".end-row").after("</a>");
-      // console.log("test");
-
-      let noLink = document.getElementsByClassName("no-link")
-      let Link = document.getElementsByClassName("link")
-
-      for(let i = 0; i < noLink.length; i++) {
-        noLink[i].classList.add("hide-small");
-        Link[i].classList.add("show-small");
-      }
-    }
 
     function updateDatabase() {
       var xhttp = new XMLHttpRequest();

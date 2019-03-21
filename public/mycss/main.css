@@ -5,6 +5,9 @@
 .food-content .food-name-expiration a {
   color: black;
 }
+.food-content .expiring p {
+  color: red;
+}
 .food-content .quantity {
   display: flex;
   flex-flow: column;
@@ -28,6 +31,60 @@
 }
 .food-content .quantity div button:first-child {
   margin-right: 10px;
+}
+
+.color-primary {
+  color: #18bc9c;
+}
+
+.color-secondary {
+  color: #2e3c50;
+}
+
+#recipe-content {
+  font-size: 1.25em;
+}
+
+#ingredient-list {
+  margin-top: 30px;
+  list-style-type: none;
+  padding-left: 0;
+}
+#ingredient-list li {
+  height: 50px;
+  padding-top: 10px;
+  padding-left: 15px;
+  border-radius: 7px;
+}
+#ingredient-list li:nth-child(even) {
+  background-color: #f2f2f2;
+}
+
+#instruction-list {
+  list-style-type: none;
+  padding-left: 0;
+}
+#instruction-list li {
+  display: grid;
+  grid-template-columns: 25% 75%;
+  margin-top: 10px;
+  padding: 15px;
+}
+#instruction-list li:nth-child(even) {
+  background-color: #f2f2f2;
+}
+#instruction-list .instruction-number {
+  border-radius: 50%;
+  background-color: #18bc9c;
+  height: 50px;
+  width: 50px;
+  color: white;
+  text-align: center;
+  margin-right: 20px;
+  padding-top: 8px;
+}
+#instruction-list .instruction-text {
+  padding-top: 8px;
 }
 
 .food-buttons div {
@@ -70,6 +127,18 @@
   padding: 15px;
 }
 
+@media screen and (min-width: 536px) {
+  #ingredient-list {
+    display: grid;
+    grid-template-columns: 50% 50%;
+  }
+  #ingredient-list li:nth-child(1), #ingredient-list li:nth-child(4), #ingredient-list li:nth-child(5), #ingredient-list li:nth-child(8), #ingredient-list li:nth-child(9), #ingredient-list li:nth-child(12), #ingredient-list li:nth-child(13), #ingredient-list li:nth-child(16), #ingredient-list li:nth-child(17), #ingredient-list li:nth-child(20) {
+    background-color: white;
+  }
+  #ingredient-list li:nth-child(2), #ingredient-list li:nth-child(3), #ingredient-list li:nth-child(6), #ingredient-list li:nth-child(7), #ingredient-list li:nth-child(10), #ingredient-list li:nth-child(11), #ingredient-list li:nth-child(14), #ingredient-list li:nth-child(15), #ingredient-list li:nth-child(18), #ingredient-list li:nth-child(19) {
+    background-color: #f2f2f2;
+  }
+}
 @media screen and (min-width: 756px) {
   .food-buttons div {
     float: right;
@@ -96,6 +165,13 @@
   .show-small {
     display: none;
   }
+
+  #instruction-list li {
+    grid-template-columns: 20% 80%;
+  }
+  #instruction-list li .instruction-number {
+    margin-left: 25px;
+  }
 }
 /*************************************************   LARGE SCREEN MEDIA QUERY   *************************************************/
 @media screen and (min-width: 992px) {
@@ -107,6 +183,10 @@
     display: flex;
     width: 60%;
     justify-content: space-between;
+  }
+
+  #instruction-list li {
+    grid-template-columns: 10% 90%;
   }
 }
 

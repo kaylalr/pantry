@@ -109,8 +109,14 @@ app.get("/food", function (req, res) {
     }
     // ??? is this the best way to do this?  look at the getAllFoods function
     db.getAllFoods(function (result) {
+        let today = new Date();
+        var date = today.toLocaleString('en-us', {
+            month: 'long'
+        }) + ' ' + today.getDate() + ', ' + today.getFullYear();
+        console.log(date);
         const params = {
-            foods: result
+            foods: result,
+            today: date
         };
         res.render("food", params);
     })
@@ -194,6 +200,95 @@ app.post("/edit/:id", function (req, res) {
         }
         // how to re-route to /food - I think this works.
         res.redirect("/food");
+    })
+})
+app.get("/recipes", function (req, res) {
+    // db.getQuantityTypes(function (result1) {
+    //     db.getFoodGroups(function (result2) {
+    //         db.getFoodById(id, function (result3) {
+    //             const params = {
+    //                 food: result3[0],
+    //                 quantity_types: result1,
+    //                 food_groups: result2
+    //             };
+    //             // console.log(params);
+    //             res.render("editFood", params);
+    //         })
+    //     })
+    // })
+    db.getAllRecipes(function (result) {
+        const params = {
+            recipes: result
+        }
+        console.log(params.recipes);
+        res.render("recipes", params);
+    })
+})
+app.get("/recipes/:id", function (req, res) {
+    id = req.params.id;
+    db.getRecipeById(id, function (result1) {
+        db.getIngredientsByRecipeId(id, function (result2) {
+            db.getInstructionsByRecipeId(id, function (result3) {
+                result2.forEach(num => {
+                    num.quantity_num = f.formatQuantity(num.quantity_num);
+                })
+                const params = {
+                    recipe: result1,
+                    ingredients: result2,
+                    instructions: result3
+                }
+                res.render("viewRecipe", params);
+            })
+        })
+    })
+})
+app.get("/findFood", function (req, res) {
+    var myRecipes = [];
+    db.getAllRecipes(function (allRecipes) {
+        var allRecipesLength = allRecipes.length;
+        var currentRecipe = 0;
+        allRecipes.forEach(recipe => {
+            db.getIngredientsByRecipeId(recipe.recipe_id, function (ingredients) {
+                var allIng = ingredients.length;
+                var myIng = 0;
+                var currentIng = 0;
+                ingredients.forEach(ing => {
+                    db.getFoodByName(ing.ingredient_name, function (food) {
+                        if (food != null) {
+                            ingNum = f.getml(ing.quantity_num, ing.quantity_type_id);
+                            foodNum = f.getml(food.quantity_num, food.quantity_type_id);
+                            if (+foodNum >= +ingNum) {
+                                myIng++;
+                            }
+                            currentIng++;
+                            console.log("allIng: " + allIng + " myIng: " + myIng)
+                            if (allIng == myIng) {
+                                db.getRecipeById(recipe.recipe_id, function (addRecipe) {
+                                    myRecipes.push(addRecipe);
+                                    // console.log("myRecipes:")
+                                    if (allRecipesLength == currentRecipe && currentIng == allIng) {
+                                        const params = {
+                                            recipes: myRecipes
+                                        }
+                                        console.log(params);
+                                        res.render("findFood", params)
+                                    }
+                                })
+                            }
+                        } else {
+                            const params = {
+                                recipes: myRecipes
+                            }
+                            res.render("findFood", params);
+                        }
+
+
+                    })
+                })
+
+            })
+            currentRecipe++
+        })
     })
 })
 app.delete("/delete/:id", function (req, res) {

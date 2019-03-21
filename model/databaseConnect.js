@@ -7,7 +7,7 @@ const pool = new Pool({
 });
 
 function getAllFoods(callback) {
-    var getAllFoods = "select f.food_id, f.food_name, f.foodgroup_id, f.quantity_num, f.expiration, qt.quantity_type_name FROM foods f JOIN quantity_types qt ON qt.quantity_type_id = f.quantity_type_id;"
+    var getAllFoods = "select f.food_id, f.food_name, f.foodgroup_id, f.quantity_num, f.expiration, qt.quantity_type_name FROM foods f JOIN quantity_types qt ON qt.quantity_type_id = f.quantity_type_id ORDER BY f.expiration;"
     pool.query(getAllFoods, function (err, result) {
         if (err) {
             console.log("Error in getAllFoods query: ")
@@ -45,6 +45,17 @@ function getFoodById(id, callback) {
         let date = year + "-" + month + "-" + day;
         result.rows[0].expiration = date;
         callback(result.rows);
+    })
+}
+
+function getFoodByName(name, callback) {
+    var getFoodByName = "Select * from foods where food_name = $1";
+    pool.query(getFoodByName, [name], function (err, result) {
+        if (err) {
+            console.log("Error in getFoodById query: ")
+            console.log(err);
+        }
+        callback(result.rows[0]);
     })
 }
 
@@ -103,13 +114,61 @@ function verifyUser(variables, callback) {
     })
 }
 
+function getAllRecipes(callback) {
+    var getAllRecipes = "select * from recipes";
+    pool.query(getAllRecipes, function (err, result) {
+        if (err) {
+            console.log("Error in checkUser query: ")
+            console.log(err)
+        }
+        callback(result.rows);
+    })
+}
+
+function getRecipeById(id, callback) {
+    var getRecipe = "select * from recipes where recipe_id = $1";
+    pool.query(getRecipe, [id], function (err, result) {
+        if (err) {
+            console.log("Error in checkUser query: ")
+            console.log(err)
+        }
+        callback(result.rows[0]);
+    })
+}
+
+function getIngredientsByRecipeId(id, callback) {
+    var getIngredients = "SELECT i.ingredient_name, i.quantity_num, q.quantity_type_name, q.quantity_type_id from ingredients i join quantity_types q on q.quantity_type_id = i.quantity_type where i.recipe_id = $1";
+    pool.query(getIngredients, [id], function (err, result) {
+        if (err) {
+            console.log("Error in checkUser query: ")
+            console.log(err)
+        }
+        callback(result.rows);
+    })
+}
+
+function getInstructionsByRecipeId(id, callback) {
+    var getInstructions = "SELECT * from instructions where recipe_id = $1";
+    pool.query(getInstructions, [id], function (err, result) {
+        if (err) {
+            console.log("Error in checkUser query: ")
+            console.log(err)
+        }
+        callback(result.rows);
+    })
+}
+
 module.exports = {
     getAllFoods: getAllFoods,
     getFoodById: getFoodById,
+    getFoodByName: getFoodByName,
     getQuantityTypes: getQuantityTypes,
     getFoodGroups: getFoodGroups,
     deleteFood: deleteFood,
     verifyUser: verifyUser,
-    updateQuantity,
-    updateQuantity
+    updateQuantity: updateQuantity,
+    getAllRecipes: getAllRecipes,
+    getIngredientsByRecipeId: getIngredientsByRecipeId,
+    getInstructionsByRecipeId: getInstructionsByRecipeId,
+    getRecipeById: getRecipeById
 }

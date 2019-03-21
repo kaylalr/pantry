@@ -74,3 +74,102 @@ insert into foods values (
     '2018-09-09',
     'ground hamburger'
 );
+
+create table recipes (
+    recipe_id       serial  not null,
+    recipe_name     varchar(100)    not null,
+    author      varchar(100),
+    primary key (recipe_id)
+);
+
+create table ingredients (
+    ingredient_id   serial  not null,
+    recipe_id       int     not null,
+    ingredient_name varchar(100)    not null,
+    quantity_num     numeric(4,2)     not null,
+    quantity_type  int     not null,
+    primary key (ingredient_id),
+    foreign key (recipe_id) REFERENCES recipes(recipe_id),
+    foreign key (quantity_type) REFERENCES quantity_types(quantity_type_id)
+);
+
+create table instructions (
+    instruction_id      serial  not null,
+    recipe_id   int     not null,
+    directions  text    not null,
+    primary key (instruction_id),
+    foreign key (recipe_id) REFERENCES recipes(recipe_id)
+);
+
+
+insert into ingredients values (
+    default,
+    1,
+    'Butter',
+    0.75,
+    4
+);
+
+insert into ingredients values (
+    default,
+    1,
+    'Sugar',
+    0.75,
+    4
+);
+
+insert into ingredients values (
+    default,
+    1,
+    'Brown Sugar',
+    0.75,
+    4
+);
+
+insert into ingredients values (
+    default,
+    1,
+    'Eggs',
+    2,
+    5
+);
+
+insert into ingredients values (
+    default,
+    1,
+    'Vanilla',
+    1,
+    3
+);
+
+insert into ingredients values (
+    default,
+    1,
+    'Flour',
+    2.25,
+    4
+);
+
+insert into ingredients values (
+    default,
+    1,
+    'Baking Soda',
+    1,
+    3
+);
+
+insert into ingredients values (
+    default,
+    1,
+    'Salt',
+    1,
+    3
+);
+
+insert into ingredients values (
+    default,
+    1,
+    'Chocolate Chips',
+    02.00,
+    3
+);
