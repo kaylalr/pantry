@@ -86,6 +86,10 @@
         crossorigin="anonymous"></script> -->
 
     <script>
+        var currentIngredient = 0;
+        var currentDirection = 0;
+        let ingInput = document.getElementById("ingCount");
+        let dirInput = document.getElementById("dirCount");
         $("#addIngredientBtn").click(function () {
             currentIngredient++
             let html = "<div class='border border-medium add-ingredient ing-count'>" +
