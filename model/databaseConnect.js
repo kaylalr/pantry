@@ -13,15 +13,15 @@ function getAllFoods(callback) {
             console.log("Error in getAllFoods query: ")
             console.log(err)
         }
-        result.rows.forEach(row => {
-            let year = row.expiration.getFullYear();
-            let month = row.expiration.getMonth() + 1;
-            let day = row.expiration.getDate();
-            let myDate = new Date(year, (month-1), day);
-            let myMonth = myDate.toLocaleString('en-us', { month: 'long' });
-            let date = myMonth + " " + day + ", " + year;
-            row.expiration = date;
-        })
+        // result.rows.forEach(row => {
+        //     let year = row.expiration.getFullYear();
+        //     let month = row.expiration.getMonth() + 1;
+        //     let day = row.expiration.getDate();
+        //     let myDate = new Date(year, (month-1), day);
+        //     let myMonth = myDate.toLocaleString('en-us', { month: 'long' });
+        //     let date = myMonth + " " + day + ", " + year;
+        //     row.expiration = date;
+        // })
         callback(result.rows);
     })
 }
@@ -136,6 +136,17 @@ function getRecipeById(id, callback) {
     })
 }
 
+function insertRecipe(params, callback) {
+    var recipeInsert = "INSERT INTO recipes values(default, $1, $2, $3) returning recipe_id";
+    pool.query(recipeInsert, params, function (err, result) {
+        if (err) {
+            console.log("Error in recipe insert query: ")
+            console.log(err);
+        }
+        callback(result);
+    })
+}
+
 function getIngredientsByRecipeId(id, callback) {
     var getIngredients = "SELECT i.ingredient_name, i.quantity_num, q.quantity_type_name, q.quantity_type_id from ingredients i join quantity_types q on q.quantity_type_id = i.quantity_type where i.recipe_id = $1";
     pool.query(getIngredients, [id], function (err, result) {
@@ -147,11 +158,35 @@ function getIngredientsByRecipeId(id, callback) {
     })
 }
 
+function insertIngredient(params, callback) {
+    var insertIngredient = "INSERT INTO ingredients values (default, $1, $2, $3, $4)";
+    pool.query(insertIngredient, params, function (err, result) {
+        if (err) {
+            console.log("Error in insertIngredient query: ")
+            console.log(err)
+        }
+        callback(result.rows);
+    })
+}
+
 function getInstructionsByRecipeId(id, callback) {
     var getInstructions = "SELECT * from instructions where recipe_id = $1";
     pool.query(getInstructions, [id], function (err, result) {
         if (err) {
-            console.log("Error in checkUser query: ")
+            console.log("Error in getInstructions query: ")
+            console.log(err)
+        }
+        callback(result.rows);
+    })
+}
+
+function insertDirection(params, callback) {
+    console.log("inertDirections params:")
+    console.log(params);
+    var insertDirections = "insert into instructions values (default, $1, $2)";
+    pool.query(insertDirections, params, function (err, result) {
+        if (err) {
+            console.log("Error in insertDirections query: ")
             console.log(err)
         }
         callback(result.rows);
@@ -168,7 +203,10 @@ module.exports = {
     verifyUser: verifyUser,
     updateQuantity: updateQuantity,
     getAllRecipes: getAllRecipes,
+    insertRecipe: insertRecipe,
     getIngredientsByRecipeId: getIngredientsByRecipeId,
+    insertIngredient: insertIngredient,
     getInstructionsByRecipeId: getInstructionsByRecipeId,
+    insertDirection: insertDirection,
     getRecipeById: getRecipeById
 }

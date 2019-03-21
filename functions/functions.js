@@ -32,8 +32,32 @@ function getml(num, type) {
     return ml;
 }
 
+function formatDate(myDate) {
+    // let year = myDate.getFullYear();
+    // let month = myDate.getMonth() + 1;
+    // if (month.toString().length == 1) {
+    //     month = "0" + month;
+    // }
+    // let day = myDate.getDate();
+    // if (day.toString().length == 1) {
+    //     day = "0" + day;
+    // }
+    // let date = year + "-" + month + "-" + day;
+    // return date;
+    let year = myDate.getFullYear();
+    let month = myDate.getMonth() + 1;
+    let day = myDate.getDate();
+    let myOldDate = new Date(year, (month - 1), day);
+    let myMonth = myOldDate.toLocaleString('en-us', {
+        month: 'long'
+    });
+    let date = myMonth + " " + day + ", " + year;
+    return date;
+}
+
 module.exports = {
     checkPassword: checkPassword,
     formatQuantity: formatQuantity,
-    getml: getml
+    getml: getml,
+    formatDate
 }

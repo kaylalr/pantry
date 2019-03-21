@@ -47,7 +47,7 @@
         <% foods.forEach(function(food) { %>
         <div class="row">
           <div class="col-8 col-sm-12 flex-row">
-            <% if(today == food.expiration || today > food.expiration) {%>
+            <% if(food.expired) {%>
             <div class="food-name-expiration expiring">
               <% } else {%>
             <div class="food-name-expiration">
@@ -55,9 +55,9 @@
               <h4 class="no-link hide-small">
                 <%= food.food_name %>
               </h4>
-              <h4 class="link show-small"><a href="/edit/<%= food.food_id%>">
+              <h5 class="link show-small"><a href="/edit/<%= food.food_id%>">
                 <%= food.food_name %>
-              </h4></a>
+              </h5></a>
               <p>
                 <%= food.expiration %>
               </p>

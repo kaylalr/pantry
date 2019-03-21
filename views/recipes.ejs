@@ -39,10 +39,21 @@
             <h2 class="text-center text-uppercase text-secondary mb-0">My Recipes</h2>
             <hr class="star-dark mb-5">
 
-            <% recipes.forEach(recipe => { %>
-                <a href="/recipes/<%= recipe.recipe_id%>"><h4><%= recipe.recipe_name%></h4></a>
-            <% })%>
-
+            <div class="all-recipes-content">
+                <% recipes.forEach(recipe => { %>
+                <div>
+                    <a href="/recipes/<%= recipe.recipe_id%>">
+                        <h3 class="hide-small">
+                            <%= recipe.recipe_name%>
+                        </h3>
+                        <h4 class="show-small">
+                            <%= recipe.recipe_name%>
+                        </h4>
+                    </a>
+                    <p><%= recipe.author%></p>
+                </div>
+                <% })%>
+            </div>
         </div>
     </section>
 

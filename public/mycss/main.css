@@ -1,4 +1,8 @@
 /*************************************************          ALL SCREENS         *************************************************/
+.padding-top {
+  padding: 5.5rem 0;
+}
+
 .food-content .row:nth-child(even) {
   background-color: #f2f2f2;
 }
@@ -21,6 +25,7 @@
 .food-content .quantity div {
   margin-left: 20px;
   display: flex;
+  justify-content: flex-end;
 }
 .food-content .quantity div button {
   font-size: 24px;
@@ -39,6 +44,11 @@
 
 .color-secondary {
   color: #2e3c50;
+}
+
+.all-recipes-content p {
+  margin-left: 20px;
+  color: gray;
 }
 
 #recipe-content {
@@ -72,6 +82,7 @@
 }
 #instruction-list li:nth-child(even) {
   background-color: #f2f2f2;
+  border-radius: 7px;
 }
 #instruction-list .instruction-number {
   border-radius: 50%;
@@ -85,6 +96,67 @@
 }
 #instruction-list .instruction-text {
   padding-top: 8px;
+}
+
+.dir-count {
+  display: flex;
+}
+.dir-count .form-group {
+  width: 95%;
+}
+.dir-count textarea {
+  margin-top: 8px;
+  resize: none;
+  /* Let's get this party started */
+  /* Track */
+  /* Handle */
+}
+.dir-count textarea::-webkit-scrollbar {
+  width: 12px;
+}
+.dir-count textarea::-webkit-scrollbar-track {
+  -webkit-box-shadow: inset 0 0 6px rgba(0, 0, 0, 0.3);
+  -webkit-border-radius: 10px;
+  border-radius: 10px;
+}
+.dir-count textarea::-webkit-scrollbar-thumb {
+  -webkit-border-radius: 10px;
+  border-radius: 10px;
+  background-color: gray;
+  -webkit-box-shadow: inset 0 0 6px rgba(0, 0, 0, 0.5);
+}
+.dir-count textarea::-webkit-scrollbar-thumb:window-inactive {
+  background-color: gray;
+}
+.dir-count .instruction-number {
+  border-radius: 50%;
+  background-color: #18bc9c;
+  height: 50px;
+  width: 55px;
+  color: white;
+  text-align: center;
+  margin-right: 18px;
+  margin-top: 10px;
+  padding-top: 12px;
+}
+
+.add-ingredient {
+  padding: 20px;
+  padding-bottom: 10px;
+  margin-top: 10px;
+}
+
+.add-ingredient-direction #ing-heading {
+  margin-bottom: 0;
+}
+.add-ingredient-direction button {
+  margin-top: 20px;
+  margin-bottom: 40px;
+}
+
+.add-ingredient-quantity {
+  display: flex;
+  justify-content: space-between;
 }
 
 .food-buttons div {
@@ -127,7 +199,20 @@
   padding: 15px;
 }
 
+.bold {
+  font-weight: bold;
+}
+
+hr.star-dark {
+  margin-top: 1.5rem;
+  margin-bottom: 2rem !important;
+}
+
 @media screen and (min-width: 536px) {
+  .padding-top {
+    padding: 6rem 0;
+  }
+
   #ingredient-list {
     display: grid;
     grid-template-columns: 50% 50%;
@@ -166,11 +251,20 @@
     display: none;
   }
 
+  .all-recipes-content {
+    padding-left: 40px;
+    font-size: 1.25em;
+  }
+
   #instruction-list li {
     grid-template-columns: 20% 80%;
   }
   #instruction-list li .instruction-number {
     margin-left: 25px;
+  }
+
+  .dir-count .instruction-number {
+    width: 52px;
   }
 }
 /*************************************************   LARGE SCREEN MEDIA QUERY   *************************************************/

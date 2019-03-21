@@ -79,7 +79,9 @@ create table recipes (
     recipe_id       serial  not null,
     recipe_name     varchar(100)    not null,
     author      varchar(100),
-    primary key (recipe_id)
+    user_id     int     not null,
+    primary key (recipe_id),
+    foreign key (user_id) REFERENCES users(user_id);
 );
 
 create table ingredients (

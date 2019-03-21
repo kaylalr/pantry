@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <meta name="description" content="">
+    <meta name="author" content="">
+
+    <title>Pantry</title>
+
+    <!-- Bootstrap core CSS -->
+    <link href="vendor/bootstrap/css/bootstrap.min.css" rel="stylesheet">
+
+    <!-- Custom fonts for this template -->
+    <link href="vendor/fontawesome-free/css/all.min.css" rel="stylesheet" type="text/css">
+    <link href="https://fonts.googleapis.com/css?family=Montserrat:400,700" rel="stylesheet" type="text/css">
+    <link href="https://fonts.googleapis.com/css?family=Lato:400,700,400italic,700italic" rel="stylesheet" type="text/css">
+
+    <!-- Plugin CSS -->
+    <link href="vendor/magnific-popup/magnific-popup.css" rel="stylesheet" type="text/css">
+
+    <!-- Custom styles for this template -->
+    <link href="css/freelancer.min.css" rel="stylesheet">
+
+    <!-- Link to my style sheet -->
+    <link href="mycss/main.css" rel="stylesheet">
+
+</head>
+
+<body id="page-top">
+
+    <% include ./common/nav.ejs%>
+
+    <!-- Add Food -->
+    <section class="addFood padding-top" id="addFood">
+        <div class="container">
+            <h2 class="text-center text-uppercase text-secondary mb-0">Add Food</h2>
+            <hr class="star-dark mb-5">
+            <form id="addRecipeForm" action="/addRecipe" method="post">
+                <div class="form-group">
+                    <label for="recipe_name">Recipe Name</label>
+                    <input type="text" class="form-control" id="recipe_name" name="recipe_name" placeholder="recipe name">
+                </div>
+                <div class="form-group">
+                    <label for="author">Author</label>
+                    <input type="text" class="form-control" id="author" name="author" placeholder="author's name">
+                </div>
+                <!-- <div id="checkChanged"> -->
+                    <div class="add-ingredient-direction">
+                        <h3 id="ing-heading">Ingredients</h3>
+                        <button id="addIngredientBtn" type="button" class="btn btn-primary">Add Ingredient</button>
+                        <input id="ingCount" name="ingCount" type="hidden" value="0">
+                    </div>
+                    <div class="add-ingredient-direction">
+                        <h3>Directions</h3>
+                        <button id="addDirectionBtn" type="button" class="btn btn-primary">Add Direction</button>
+                        <input id="dirCount" name="dirCount" type="hidden" value="0">
+                    </div>
+                <!-- </div> -->
+                <button id="addFoodBtn" type="submit" class="btn btn-primary">Add Recipe</button>
+                <a href="/food"><button type="button" class="btn btn-danger">Cancel</button></a>
+            </form>
+        </div>
+    </section>
+
+    <% include ./common/footer.ejs%>
+
+    <!-- Bootstrap core JavaScript -->
+    <script src="vendor/jquery/jquery.min.js"></script>
+    <script src="vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
+
+    <!-- Plugin JavaScript -->
+    <script src="vendor/jquery-easing/jquery.easing.min.js"></script>
+    <script src="vendor/magnific-popup/jquery.magnific-popup.min.js"></script>
+
+    <!-- Contact Form JavaScript -->
+    <script src="js/jqBootstrapValidation.js"></script>
+    <script src="js/contact_me.js"></script>
+
+    <!-- Custom scripts for this template -->
+    <script src="js/freelancer.min.js"></script>
+
+    <!-- <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery.form/4.2.2/jquery.form.min.js" integrity="sha384-FzT3vTVGXqf7wRfy8k4BiyzvbNfeYjK+frTVqZeNDFl8woCbF0CYG6g2fMEFFo/i"
+        crossorigin="anonymous"></script> -->
+
+    <script>
+        $("#addIngredientBtn").click(function () {
+            currentIngredient++
+            let html = "<div class='border border-medium add-ingredient ing-count'>" +
+                "<div class='form-group'>" +
+                "<label class='bold' for='ingredient_name'>Ingredient Name</label>" +
+                "<input type='text' class='form-control' id='ingredient_name" +
+                "' name='ingredient_name' placeholder='ingredient name'>" +
+                "</div>" +
+                "<div class='form-group'>" +
+                "<label for='quantity_num bold'>Quantity</label>" +
+                "<div class='add-ingredient-quantity'>" +
+                "<input type='number' step='0.01' class='form-control col-4' id='quantity_num" +
+                "' name='quantity_num'>" +
+                "<select id='quantity_type' name='quantity_type" +
+                "' class='form-control col-7'>" +
+                "<% quantity_types.forEach(q => {%>" +
+                "<option value='<%= q.quantity_type_id%>'><%= q.quantity_type_name%></option>" +
+                "<% })%>" +
+                "</select>" +
+                "</div>" +
+                "</div>" +
+                "</div>"
+            $("#addIngredientBtn").before(html);
+            ingInput.value = currentIngredient;
+        })
+        $("#addDirectionBtn").click(function () {
+            currentDirection++
+            let html = "<div class='dir-count'><div class='instruction-number'>" + currentDirection + "</div>" +
+                "<div class='form-group'>" +
+                "<textarea type='textarea' class='form-control' id='direction" + currentIngredient +
+                "' name='direction' placeholder='instructions'></textarea>" +
+                "</div>" +
+                "</div>"
+            $("#addDirectionBtn").before(html);
+            dirInput.value = currentDirection;
+        })
+    </script>
+</body>
+
+</html>
