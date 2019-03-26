@@ -4,7 +4,6 @@ const url = require('url');
 const PORT = process.env.PORT || 5000;
 const session = require('express-session');
 let stayLoggedin = true;
-// const bodyParser = require('body-parser');
 
 const {
     Pool
@@ -67,14 +66,46 @@ app.set("view engine", "ejs");
 
 
 app.get("/", function (req, res) {
-    // console.log(req.session.user)
-
     res.render('index');
 });
 app.get("/login", function (req, res) {
     res.render('login');
 });
-app.post("/login", function (req, res) {
+app.post("/login", loginPost);
+
+app.get("/food", getFood);
+
+app.post("/food/:id/:quantity", foodQuantityPost)
+
+app.get("/addFood", addFoodGet)
+
+app.post("/addFood", addFoodPost);
+
+app.get("/edit/:id", editFoodGet);
+// SHOULD THIS BE A PUT? HOW DO YOU DO THAT?
+app.post("/edit/:id", editFoodPost);
+
+app.get("/recipes", getRecipes);
+
+app.get("/recipes/:id", recipeByIdGet);
+
+app.get("/addRecipe", addRecipeGet);
+
+app.post("/addRecipe", addRecipePost);
+
+app.get("/editRecipe/:id", editRecipeGet);
+
+app.post("/editRecipe/:id", editRecipePost);
+
+app.get("/findFood", findFoodGet);
+
+app.delete("/delete/:id", foodDelete);
+
+app.listen(PORT, function () {
+    console.log("Server is running...");
+});
+
+function loginPost(req, res) {
     let username = req.body.username;
     let password = req.body.password;
     let variables = {
@@ -102,8 +133,9 @@ app.post("/login", function (req, res) {
             res.redirect("/food");
         }
     })
-});
-app.get("/food", function (req, res) {
+}
+
+function getFood(req, res) {
     if (req.session.user == 'undefined' || req.session.user == null && stayLoggedin == false) {
         res.redirect("/");
     }
@@ -123,13 +155,15 @@ app.get("/food", function (req, res) {
         };
         res.render("food", params);
     })
-});
-app.post("/food/:id/:quantity", function (req, res) {
+}
+
+function foodQuantityPost(req, res) {
     let id = req.params.id;
     let quantity = req.params.quantity;
     db.updateQuantity(id, quantity);
-})
-app.get("/addFood", function (req, res) {
+}
+
+function addFoodGet(req, res) {
     if (req.session.user == 'undefined' || req.session.user == null && stayLoggedin == false) {
         res.redirect("/");
     }
@@ -144,8 +178,9 @@ app.get("/addFood", function (req, res) {
         })
 
     })
-})
-app.post("/addFood", function (req, res) {
+}
+
+function addFoodPost(req, res) {
     let food_name = req.body.food_name;
     let food_type = req.body.food_type;
     let quantity_num = req.body.quantity_num;
@@ -162,8 +197,9 @@ app.post("/addFood", function (req, res) {
         }
         res.redirect("/food");
     })
-});
-app.get("/edit/:id", function (req, res) {
+}
+
+function editFoodGet(req, res) {
     if (req.session.user == 'undefined' || req.session.user == null && stayLoggedin == false) {
         res.redirect("/");
     }
@@ -185,9 +221,9 @@ app.get("/edit/:id", function (req, res) {
             })
         })
     })
-});
-// SHOULD THIS BE A PUT? HOW DO YOU DO THAT?
-app.post("/edit/:id", function (req, res) {
+}
+
+function editFoodPost(req, res) {
     // WHAT IF SOMEONE CHANGED THE ID AND THEN SUBMITTED THE FORM?
     let id = req.params.id;
     let food_name = req.body.food_name;
@@ -208,8 +244,18 @@ app.post("/edit/:id", function (req, res) {
         // how to re-route to /food - I think this works.
         res.redirect("/food");
     })
-})
-app.get("/recipes", function (req, res) {
+}
+
+function foodDelete(req, res) {
+    let id = req.params.id;
+    // console.log("delete " + id);
+    db.deleteFood(id, function () {
+        // WHY DOESN'T THIS WORK??
+        // res.redirect("/food");
+    })
+}
+
+function getRecipes(req, res) {
     if (req.session.user == 'undefined' || req.session.user == null && stayLoggedin == false) {
         res.redirect("/");
     }
@@ -220,8 +266,9 @@ app.get("/recipes", function (req, res) {
         // console.log(params.recipes);
         res.render("recipes", params);
     })
-})
-app.get("/recipes/:id", function (req, res) {
+}
+
+function recipeByIdGet(req, res) {
     if (req.session.user == 'undefined' || req.session.user == null && stayLoggedin == false) {
         res.redirect("/");
     }
@@ -241,8 +288,9 @@ app.get("/recipes/:id", function (req, res) {
             })
         })
     })
-})
-app.get("/addRecipe", function (req, res) {
+}
+
+function addRecipeGet(req, res) {
     if (req.session.user == 'undefined' || req.session.user == null && stayLoggedin == false) {
         res.redirect("/");
     }
@@ -252,10 +300,12 @@ app.get("/addRecipe", function (req, res) {
         }
         res.render("addRecipe", params);
     })
-})
-app.post("/addRecipe", function (req, res) {
+}
+
+function addRecipePost(req, res) {
     let ingNum = req.body.ingCount;
     let dirNum = req.body.dirCount;
+    let dirCount = req.body.instructionNumber;
     var curIng = 0;
     let curDir = 0;
     //const params = [ingNum, dirNum]
@@ -287,7 +337,8 @@ app.post("/addRecipe", function (req, res) {
                     for (j = 0; j < dirNum; j++) {
                         let dirParams = [
                             recipe_id,
-                            directions[j]
+                            directions[j],
+                            dirCount[i]
                         ]
                         // console.log("dir params:")
                         // console.log(dirParams)
@@ -304,84 +355,166 @@ app.post("/addRecipe", function (req, res) {
         }
         res.redirect("/recipes");
     })
-})
-app.get("/findFood", function (req, res) {
-    if (req.session.user == 'undefined' || req.session.user == null && stayLoggedin == false) {
-        res.redirect("/");
-    }
-    var myRecipes = [];
-    db.getAllRecipes(function (allRecipes) {
-        var allRecipesLength = allRecipes.length;
-        console.log("allRecipes: " + allRecipesLength);
-        var currentRecipe = 0;
-        allRecipes.forEach(recipe => {
+}
 
-            db.getIngredientsByRecipeId(recipe.recipe_id, function (ingredients) {
-                var allIng = ingredients.length;
-                var myIng = 0;
-                var currentIng = 0;
-                ingredients.forEach(ing => {
-                    db.getFoodByName(ing.ingredient_name, function (food) {
-                        if (myIng == 0) {
-                            currentRecipe++
-                            console.log("curr: " + currentRecipe);
-                        }
-                        currentIng++;
-                        if (food != null) {
-                            ingNum = f.getml(ing.quantity_num, ing.quantity_type_id);
-                            foodNum = f.getml(food.quantity_num, food.quantity_type_id);
-                            if (+foodNum >= +ingNum) {
-                                myIng++;
-                            }
-                            // currentIng++;
-                            // console.log("allIng: " + allIng + " myIng: " + myIng)
-                            if (currentIng == allIng) {
-                                if (allIng == myIng) {
-                                    db.getRecipeById(recipe.recipe_id, function (addRecipe) {
-                                        myRecipes.push(addRecipe);
-                                        // console.log("myRecipes:")
-                                        if (allRecipesLength == currentRecipe) {
-                                            console.log("compare: ")
-                                            console.log(allRecipesLength + " == " + currentRecipe)
-                                            const params = {
-                                                recipes: myRecipes
-                                            }
-                                            console.log(params);
-                                            res.render("findFood", params)
-                                        }
-                                    })
-                                }
-                                // else if(allRecipesLength == currentRecipe) {
-                                //     const params = {
-                                //         recipes: myRecipes
-                                //     }
-                                //     console.log("render 2")
-                                //     res.render("findFood", params);
-                                // }
-                            }
-                        }
-                        
-                        //  else if (allRecipesLength == currentRecipe && currentIng) {
-                        //     const params = {
-                        //         recipes: myRecipes
-                        //     }
-                        //     console.log("render 3")
-                        //     res.render("findFood", params);
-                        // }
-                    })
+function editRecipeGet(req, res) {
+    id = req.params.id;
+    db.getRecipeById(id, function (recipe) {
+        db.getIngredientsByRecipeId(id, function (ing) {
+            db.getInstructionsByRecipeId(id, function (ins) {
+                db.getQuantityTypes(function (types) {
+                    const params = {
+                        recipe: recipe,
+                        ingredients: ing,
+                        directions: ins,
+                        quantity_types: types
+                    }
+                    res.render("editRecipe", params);
                 })
             })
         })
     })
-})
-app.delete("/delete/:id", function (req, res) {
-    let id = req.params.id;
-    // console.log("delete " + id);
-    db.deleteFood(id, function () {
-        // WHY DOESN'T THIS WORK??
-        // res.redirect("/food");
+}
+
+function editRecipePost(req, res) {
+    id = req.params.id;
+    let ingNum = req.body.ing_id;
+    let ingTotal = req.body.ingCount;
+    let ingNames = req.body.ingredient_name
+    let q_nums = req.body.quantity_num
+    let q_types = req.body.quantity_type
+    let ingDelete = req.body.ingDelete;
+    let ingDeleteId = ingDelete.split(",");
+
+    console.log("ingNum: " + ingNum);
+    console.log(typeof ingNum);
+
+    // need this for same reason as: if(typeof dirNum =='string')
+    if (typeof ingNum == 'string') {
+        ingNum = [ingNum];
+    }
+    // console.log(typeof ingNames)
+    if (typeof ingNames == 'string') {
+        ingNames = [ingNames, ""]
+        // console.log("ingNames: ")
+        console.log(typeof ingNames)
+
+    }
+
+    let dirNum = req.body.dir_id;
+    /* If the user deletes all the original directions except one, 
+     *  it was giving me a problem because dirNum would equal the id
+     *  of that one direction (i.e. 33) and the length would be two.
+     *  But if more than one was left, dirNum would be something like
+     *  ["33", "34"] and the length would be two, which is what I wanted.
+     *  So I added the following if statement to change dirNum so that
+     *  the length would only be 1 if there was only one original direction left.
+     */
+    if (typeof dirNum == 'string') {
+        dirNum = [dirNum];
+    }
+    let dirTotal = req.body.dirCount;
+    let dirSteps = req.body.direction;
+    let dirDelete = req.body.dirDelete;
+    let dirDeleteId = dirDelete.split(",");
+    let dirOrder = req.body.instructionNumber;
+
+    const recipeParams = [id, req.body.recipe_name, req.body.author, 1];
+    db.updateRecipe(recipeParams, function (result) {
+        for (i = 0; i < ingNum.length; i++) {
+            let ingParams = [
+                id,
+                ingNames[i],
+                q_nums[i],
+                q_types[i],
+                ingNum[i]
+            ];
+            console.log("ingParams: ");
+            console.log(ingParams);
+            db.updateIngredient(ingParams, function () {})
+        }
+        for (i = ingNum.length; i < ingTotal; i++) {
+            let params = [
+                id,
+                ingNames[i],
+                q_nums[i],
+                q_types[i]
+            ];
+            db.insertIngredient(params, function () {})
+        }
+        for (i = 0; i < ingDeleteId.length; i++) {
+            db.deleteIngredient(ingDeleteId[i], function () {})
+        }
+        for (i = 0; i < dirNum.length; i++) {
+            let params = [
+                id,
+                dirNum[i],
+                dirSteps[i],
+                dirOrder[i]
+            ]
+            db.updateInstruction(params, function () {})
+        }
+        for (i = dirNum.length; i < dirTotal; i++) {
+            let params = [
+                id,
+                dirSteps[i],
+                dirOrder[i]
+            ]
+            db.insertDirection(params, function () {})
+        }
+        for (i = 0; i < dirDeleteId.length; i++) {
+            db.deleteInstruction(dirDeleteId[i], function () {})
+        }
+        res.redirect("/recipes/" + id);
     })
-})
-app.listen(PORT, function () {
-    console.log("Server is running...");
-});
+}
+
+function findFoodGet(req, res) {
+    if (req.session.user == 'undefined' || req.session.user == null && stayLoggedin == false) {
+        res.redirect("/");
+    }
+    let myRecipes = [];
+    // get all the foods the user has
+    db.getAllFoods(function (food) {
+        // get all the recipes for the user
+        db.getAllRecipes(function (recipes) {
+            // get all the ingredients for all recipes
+            db.getAllIngredients(function (ingredients) {
+                // go through each recipe
+                recipes.forEach(recipe => {
+                    let ingForRecipe = [];
+                    let recipeId = recipe.recipe_id;
+                    let enoughFood = [];
+                    // for each recipe, it will find all the ingredients with that recipe id
+                    ingredients.find(function (value) {
+                        if (value.recipe_id == recipeId) {
+                            ingForRecipe.push(value);
+                        }
+                    })
+                    // go through all the ingredients for the recipe
+                    ingForRecipe.forEach(ing => {
+                        // find food with the same name
+                        let myFood = food.find(f => f.food_name == ing.ingredient_name);
+                        // if there was food with that name, check the amounts
+                        if (myFood != undefined) {
+                            foodNum = f.getml(myFood.quantity_num, myFood.quantity_type_id);
+                            ingNum = f.getml(ing.quantity_num, ing.quantity_type);
+                            // if the amount of food is greater than or equal to the amount in the recipe, add it to an array
+                            if (+foodNum >= +ingNum) {
+                                enoughFood.push(myFood);
+                            }
+                        }
+                    })
+                    // after going through each ingredient and checking the food, check to see if the amount of foods is equal to the amount of ingredients
+                    if (enoughFood.length == ingForRecipe.length) {
+                        myRecipes.push(recipe);
+                    }
+                })
+                const params = {
+                    recipes: myRecipes
+                }
+                res.render("findFood", params);
+            })
+        })
+    })
+}

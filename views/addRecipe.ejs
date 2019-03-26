@@ -36,7 +36,7 @@
     <!-- Add Food -->
     <section class="addFood padding-top" id="addFood">
         <div class="container">
-            <h2 class="text-center text-uppercase text-secondary mb-0">Add Food</h2>
+            <h2 class="text-center text-uppercase text-secondary mb-0">Add Recipe</h2>
             <hr class="star-dark mb-5">
             <form id="addRecipeForm" action="/addRecipe" method="post">
                 <div class="form-group">
@@ -45,7 +45,7 @@
                 </div>
                 <div class="form-group">
                     <label for="author">Author</label>
-                    <input type="text" class="form-control" id="author" name="author" placeholder="author's name">
+                    <input type="text" class="form-control" id="author" name="author" placeholder="who's recipe is it?">
                 </div>
                 <!-- <div id="checkChanged"> -->
                     <div class="add-ingredient-direction">
@@ -60,7 +60,7 @@
                     </div>
                 <!-- </div> -->
                 <button id="addFoodBtn" type="submit" class="btn btn-primary">Add Recipe</button>
-                <a href="/food"><button type="button" class="btn btn-danger">Cancel</button></a>
+                <a href="/recipes"><button type="button" class="btn btn-danger">Cancel</button></a>
             </form>
         </div>
     </section>
@@ -93,39 +93,80 @@
         $("#addIngredientBtn").click(function () {
             currentIngredient++
             let html = "<div class='border border-medium add-ingredient ing-count'>" +
-                "<div class='form-group'>" +
-                "<label class='bold' for='ingredient_name'>Ingredient Name</label>" +
-                "<input type='text' class='form-control' id='ingredient_name" +
-                "' name='ingredient_name' placeholder='ingredient name'>" +
-                "</div>" +
-                "<div class='form-group'>" +
-                "<label for='quantity_num bold'>Quantity</label>" +
-                "<div class='add-ingredient-quantity'>" +
-                "<input type='number' step='0.01' class='form-control col-4' id='quantity_num" +
-                "' name='quantity_num'>" +
-                "<select id='quantity_type' name='quantity_type" +
-                "' class='form-control col-7'>" +
-                "<% quantity_types.forEach(q => {%>" +
-                "<option value='<%= q.quantity_type_id%>'><%= q.quantity_type_name%></option>" +
-                "<% })%>" +
-                "</select>" +
-                "</div>" +
-                "</div>" +
-                "</div>"
+                            "<div class='form-group'>" +
+                                "<label class='bold' for='ingredient_name'>Ingredient Name</label>" +
+                                "<input type='text' class='form-control' id='ingredient_name" +
+                                "' name='ingredient_name' placeholder='ingredient name'>" +
+                            "</div>" +
+                            "<div class='form-group'>" +
+                                "<label for='quantity_num bold'>Quantity</label>" +
+                                "<div class='add-ingredient-quantity'>" +
+                                    "<input type='number' step='0.01' class='form-control col-4' id='quantity_num" +
+                                    "' name='quantity_num'>" +
+                                    "<select id='quantity_type' name='quantity_type" +
+                                    "' class='form-control col-7'>" +
+                                        "<% quantity_types.forEach(q => {%>" +
+                                        "<option value='<%= q.quantity_type_id%>'><%= q.quantity_type_name%></option>" +
+                                        "<% })%>" +
+                                    "</select>" +
+                                    "</div>" +
+                            "</div>" +
+                            "<p class='red click-underline' id=ing"+currentIngredient+" onclick='removeIngredient("+currentIngredient+")'>Remove Ingredient</p>" +
+                        "</div>"
             $("#addIngredientBtn").before(html);
             ingInput.value = currentIngredient;
         })
         $("#addDirectionBtn").click(function () {
             currentDirection++
-            let html = "<div class='dir-count'><div class='instruction-number'>" + currentDirection + "</div>" +
-                "<div class='form-group'>" +
-                "<textarea type='textarea' class='form-control' id='direction" + currentIngredient +
-                "' name='direction' placeholder='instructions'></textarea>" +
-                "</div>" +
-                "</div>"
+            let html = "<div class='dir-count'>"+
+                            "<div class='dir-count-flex'>"+
+                                "<textarea name='instructionNumber' class='instruction-number'>" + currentDirection + "</textarea>" +
+                                "<div class='form-group'>" +
+                                    "<textarea type='textarea' class='form-control' id='direction" + currentIngredient +
+                                    "' name='direction' placeholder='instructions'></textarea>" +
+                                "</div>" +
+                            "</div>" +
+                            "<p class='red click-underline' id=dir"+currentDirection+" onclick='removeDirection("+currentDirection+")'>Remove Step</p>"+
+                        "</div>"
             $("#addDirectionBtn").before(html);
             dirInput.value = currentDirection;
         })
+        function removeIngredient(num) {
+            id = "ing"+num.toString();
+            let el = document.getElementById(id);
+            let pel = el.parentElement;
+            pel.parentElement.removeChild(pel);
+            let curVal = ingInput.value;
+            currentIngredient--;
+            ingInput.value = curVal-1;
+        }
+        function removeDirection(num) {
+            id = "dir"+num.toString();
+            let el = document.getElementById(id);
+            let pel = el.parentElement;
+            // console.log(pel.childNodes[0].childNodes[0]);
+            let newPel = pel
+            
+            let newNum = pel.childNodes[0].childNodes[0].innerHTML;
+            for(i = newNum; i < currentDirection; i++) {
+                // console.log(newPel.nextSibling.childNodes[0].childNodes[0].innerHTML)
+                newPel.nextSibling.childNodes[0].childNodes[0].innerHTML = i;
+                newPel = newPel.nextSibling;
+                console.log(newPel.childNodes);
+            }
+            pel.parentElement.removeChild(pel);
+            // let numbers = document.getElementsByClassName("instruction-number");
+            // console.log(numbers);
+            // for(i = 0; i < numbers.length; i ++) {
+            //     let oldNum = numbers[i].textContent;
+            //     console.log("old: "+oldNum)
+            //     console.log("new: "+oldNum-1)
+            //     numbers[i].textContent = oldNum-1;
+            // }
+            let curVal = dirInput.value;
+            currentDirection--
+            dirInput.value = curVal-1;
+        }
     </script>
 </body>
 

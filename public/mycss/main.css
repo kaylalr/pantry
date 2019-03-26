@@ -98,41 +98,41 @@
   padding-top: 8px;
 }
 
-.dir-count {
+.dir-count-flex {
   display: flex;
 }
-.dir-count .form-group {
+.dir-count-flex .form-group {
   width: 95%;
 }
-.dir-count textarea {
+.dir-count-flex textarea {
   margin-top: 8px;
   resize: none;
   /* Let's get this party started */
   /* Track */
   /* Handle */
 }
-.dir-count textarea::-webkit-scrollbar {
+.dir-count-flex textarea::-webkit-scrollbar {
   width: 12px;
 }
-.dir-count textarea::-webkit-scrollbar-track {
+.dir-count-flex textarea::-webkit-scrollbar-track {
   -webkit-box-shadow: inset 0 0 6px rgba(0, 0, 0, 0.3);
   -webkit-border-radius: 10px;
   border-radius: 10px;
 }
-.dir-count textarea::-webkit-scrollbar-thumb {
+.dir-count-flex textarea::-webkit-scrollbar-thumb {
   -webkit-border-radius: 10px;
   border-radius: 10px;
   background-color: gray;
   -webkit-box-shadow: inset 0 0 6px rgba(0, 0, 0, 0.5);
 }
-.dir-count textarea::-webkit-scrollbar-thumb:window-inactive {
+.dir-count-flex textarea::-webkit-scrollbar-thumb:window-inactive {
   background-color: gray;
 }
-.dir-count .instruction-number {
+.dir-count-flex .instruction-number {
   border-radius: 50%;
   background-color: #18bc9c;
   height: 50px;
-  width: 55px;
+  width: 58px;
   color: white;
   text-align: center;
   margin-right: 18px;
@@ -199,6 +199,14 @@
   padding: 15px;
 }
 
+.red {
+  color: red;
+}
+
+.click-underline:active {
+  text-decoration: underline;
+}
+
 .bold {
   font-weight: bold;
 }
@@ -263,7 +271,7 @@ hr.star-dark {
     margin-left: 25px;
   }
 
-  .dir-count .instruction-number {
+  .dir-count-flex .instruction-number {
     width: 52px;
   }
 }

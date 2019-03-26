@@ -1,0 +1,261 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <meta name="description" content="">
+    <meta name="author" content="">
+
+    <title>Pantry</title>
+
+    <!-- Bootstrap core CSS -->
+    <link href="/vendor/bootstrap/css/bootstrap.min.css" rel="stylesheet">
+
+    <!-- Custom fonts for this template -->
+    <link href="/vendor/fontawesome-free/css/all.min.css" rel="stylesheet" type="text/css">
+    <link href="https://fonts.googleapis.com/css?family=Montserrat:400,700" rel="stylesheet" type="text/css">
+    <link href="https://fonts.googleapis.com/css?family=Lato:400,700,400italic,700italic" rel="stylesheet" type="text/css">
+
+    <!-- Plugin CSS -->
+    <link href="/vendor/magnific-popup/magnific-popup.css" rel="stylesheet" type="text/css">
+
+    <!-- Custom styles for this template -->
+    <link href="/css/freelancer.min.css" rel="stylesheet">
+
+    <!-- Link to my style sheet -->
+    <link href="/mycss/main.css" rel="stylesheet">
+
+</head>
+
+<body id="page-top">
+
+    <% include ./common/nav.ejs%>
+
+    <!-- Add Food -->
+    <section class="addFood padding-top" id="addFood">
+        <div class="container">
+            <h2 class="text-center text-uppercase text-secondary mb-0">Add Recipe</h2>
+            <hr class="star-dark mb-5">
+            <form id="addRecipeForm" action="/editRecipe/<%= recipe.recipe_id%>" method="post">
+                <div class="form-group">
+                    <label for="recipe_name">Recipe Name</label>
+                    <input type="text" class="form-control" id="recipe_name" name="recipe_name" value="<%= recipe.recipe_name%>">
+                </div>
+                <div class="form-group">
+                    <label for="author">Author</label>
+                    <input type="text" class="form-control" id="author" name="author" value="<%= recipe.author %>">
+                </div>
+                <!-- <div id="checkChanged"> -->
+                <div class="add-ingredient-direction">
+                    <h3 id="ing-heading">Ingredients</h3>
+                    <% let currentIng = 0;
+                        ingredients.forEach(ing => {
+                            currentIng++%>
+                    <div class='border border-medium add-ingredient ing-count'>
+                        <div class='form-group'>
+                            <label class='bold' for='ingredient_name'>Ingredient Name</label>
+                            <input type='text' class='form-control' id='ingredient_name' name='ingredient_name' value="<%= ing.ingredient_name%>">
+                        </div>
+                        <div class='form-group'>
+                            <label for='quantity_num bold'>Quantity</label>
+                            <div class='add-ingredient-quantity'>
+                                <input type='number' step='0.01' class='form-control col-4' id='quantity_num' name='quantity_num'
+                                    value="<%= ing.quantity_num%>">
+                                <select id='quantity_type' name='quantity_type' class='form-control col-7'>
+                                    <% quantity_types.forEach(q => {
+                                        if(ing.quantity_type_id == q.quantity_type_id) {%>
+                                    <option value='<%= q.quantity_type_id%>' selected>
+                                        <%= q.quantity_type_name%>
+                                    </option>
+                                    <% } else {%>
+                                    <option value='<%= q.quantity_type_id%>'>
+                                        <%= q.quantity_type_name%>
+                                    </option>
+                                    <%}})%>
+                                </select>
+                            </div>
+                        </div>
+                        <input type="hidden" id="ing_id" name="ing_id" value="<%= ing.ingredient_id%>">
+                        <p class='red click-underline' id="ing<%= currentIng%>" onclick='removeIngredient("<%= currentIng%>")'>Remove
+                            Ingredient</p>
+                    </div>
+                    <% })%>
+                    <button id="addIngredientBtn" type="button" class="btn btn-primary">Add Ingredient</button>
+                    <input id="ingCount" name="ingCount" type="hidden" value="0">
+                </div>
+                <div class="add-ingredient-direction">
+                    <h3>Directions</h3>
+                    <% let currentD = 0;
+                    directions.forEach(dir => {
+                        currentD++ %>
+                    <div class='dir-count'>
+                        <div class='dir-count-flex'>
+                            <textarea name="instructionNumber" class='instruction-number' readonly><%= currentD%></textarea>
+                            <div class='form-group'><textarea type='textarea' class='form-control' id='direction<%= currentD %>>'
+                                    name='direction'><%= dir.directions%></textarea></div>
+                        </div>
+                        <p class='red click-underline' id='dir<%= currentD%>' onclick='removeDirection("<%= currentD%>")'>Remove
+                            Step</p><input type="hidden" id="dir_id" name="dir_id" value="<%= dir.instruction_id%>">
+                    </div>
+                    <% })%>
+                    <button id="addDirectionBtn" type="button" class="btn btn-primary">Add Direction</button>
+                    <input id="dirCount" name="dirCount" type="hidden" value="0">
+                </div>
+                <input type="hidden" name="ingDelete" id="ingDelete" value="0">
+                <input type="hidden" name="dirDelete" id="dirDelete" value="0">
+                <!-- </div> -->
+                <button id="addFoodBtn" type="submit" class="btn btn-primary">Update Recipe</button>
+                <a href="/recipes/<%= recipe.recipe_id%>"><button type="button" class="btn btn-danger">Cancel</button></a>
+            </form>
+        </div>
+    </section>
+
+    <% include ./common/footer.ejs%>
+
+    <!-- Bootstrap core JavaScript -->
+    <script src="/vendor/jquery/jquery.min.js"></script>
+    <script src="/vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
+
+    <!-- Plugin JavaScript -->
+    <script src="/vendor/jquery-easing/jquery.easing.min.js"></script>
+    <script src="/vendor/magnific-popup/jquery.magnific-popup.min.js"></script>
+
+    <!-- Contact Form JavaScript -->
+    <script src="/js/jqBootstrapValidation.js"></script>
+    <script src="/js/contact_me.js"></script>
+
+    <!-- Custom scripts for this template -->
+    <script src="/js/freelancer.min.js"></script>
+
+    <!-- <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery.form/4.2.2/jquery.form.min.js" integrity="sha384-FzT3vTVGXqf7wRfy8k4BiyzvbNfeYjK+frTVqZeNDFl8woCbF0CYG6g2fMEFFo/i"
+        crossorigin="anonymous"></script> -->
+
+    <script>
+        var currentIngredient = document.getElementsByClassName("ing-count").length;
+        // console.log(currentIngredient)
+        var currentDirection = document.getElementsByClassName("dir-count").length;
+        let ingInput = document.getElementById("ingCount");
+        let dirInput = document.getElementById("dirCount");
+        let ingToDelete = document.getElementById("ingDelete");
+        let dirToDelete = document.getElementById("dirDelete");
+        let deleteIngredient = [];
+        let deleteDirection = [];
+        $("#addIngredientBtn").click(function () {
+            currentIngredient++
+            let html = "<div class='border border-medium add-ingredient ing-count'>" +
+                "<div class='form-group'>" +
+                "<label class='bold' for='ingredient_name'>Ingredient Name</label>" +
+                "<input type='text' class='form-control' id='ingredient_name" +
+                "' name='ingredient_name' placeholder='ingredient name'>" +
+                "</div>" +
+                "<div class='form-group'>" +
+                "<label for='quantity_num bold'>Quantity</label>" +
+                "<div class='add-ingredient-quantity'>" +
+                "<input type='number' step='0.01' class='form-control col-4' id='quantity_num" +
+                "' name='quantity_num'>" +
+                "<select id='quantity_type' name='quantity_type" +
+                "' class='form-control col-7'>" +
+                "<% quantity_types.forEach(q => {%>" +
+                "<option value='<%= q.quantity_type_id%>'><%= q.quantity_type_name%></option>" +
+                "<% })%>" +
+                "</select>" +
+                "</div>" +
+                "</div>" +
+                "<p class='red click-underline' id=ing" + currentIngredient + " onclick='removeIngredient(" +
+                currentIngredient + ")'>Remove Ingredient</p>" +
+                "</div>"
+            $("#addIngredientBtn").before(html);
+            ingInput.value = currentIngredient;
+        })
+        $("#addDirectionBtn").click(function () {
+            currentDirection++
+            let html = "<div class='dir-count'>" +
+                "<div class='dir-count-flex'>" +
+                "<textarea name='instructionNumber' class='instruction-number' readonly>" + currentDirection + "</textarea>" +
+                "<div class='form-group'>" +
+                "<textarea type='textarea' class='form-control' id='direction" + currentIngredient +
+                "' name='direction' placeholder='instructions'></textarea>" +
+                "</div>" +
+                "</div>" +
+                "<p class='red click-underline' id=dir" + currentDirection + " onclick='removeDirection(" +
+                currentDirection + ")'>Remove Step</p>" +
+                "</div>"
+            $("#addDirectionBtn").before(html);
+            dirInput.value = currentDirection;
+        })
+
+        function removeIngredient(num) {
+            id = "ing" + num.toString();
+            let el = document.getElementById(id);
+            let pel = el.parentElement;
+            // console.log(pel.childNodes.item("ing_id"))
+            // console.log(pel.childNodes[5])
+            let test = pel.childNodes[5]
+            // console.log(test)
+            // console.log(test.value)
+            // console.log(pel.childNodes.item('input#ing_id'))
+            if (test != undefined) {
+                // console.log("contains id");
+                deleteIngredient.push(test.value);
+                ingToDelete.value = deleteIngredient;
+            }
+            pel.parentElement.removeChild(pel);
+            let curVal = ingInput.value;
+            currentIngredient--;
+            ingInput.value = curVal - 1;
+        }
+
+        function removeDirection(num) {
+            // IF THIS BREAKS, MAKE SURE THERE ARE NO SPACES BETWEEN ANY OF THE ELEMENTS IN THE FOREACH LOOP FOR DIRECTIONS IN THE HTML ABOVE.  NOT THE HTML THAT GETS INSERTED WHEN YOU CLICK THE BUTTON, BUT THE HTML THAT'S MADE FOR EACH OF THE DIRECTIONS FOUND IN THE DATABASE
+            id = "dir" + num.toString();
+            let el = document.getElementById(id);
+            let pel = el.parentElement;
+            let newPel = pel
+            console.log("testing")
+            console.log(pel.querySelector("div.dir-count-flex"))
+
+            let newNum = pel.querySelector("div.dir-count-flex").querySelector("textarea.instruction-number").innerHTML;
+            for (i = newNum; i < currentDirection; i++) {
+                newPel = newPel.nextElementSibling;
+
+                console.log("newPel:");
+                console.log(newPel);
+                newPel.querySelector("div.dir-count-flex").querySelector("textarea.instruction-number").innerHTML = i;
+            }
+            let val = pel.querySelector("input#dir_id");
+            console.log("val: ");
+            // console.log(pel.childNodes)
+            console.log(val)
+            // console.log(val.value);
+            if (val != undefined) {
+                deleteDirection.push(val.value);
+                console.log(deleteDirection)
+                dirToDelete.value = deleteDirection;
+            }
+
+
+            // let newNum = pel.childNodes[0].childNodes[0].innerHTML;
+            // for (i = newNum; i < currentDirection; i++) {
+            //     console.log("next sibbling:");
+            //     console.log(newPel.nextSibling.childNodes);
+            //     newPel.nextSibling.childNodes[0].childNodes[0].innerHTML = i;
+            //     newPel = newPel.nextSibling;
+            // }
+            // let val = pel.childNodes[2];
+            // // console.log(val.value);
+            // if (val != undefined) {
+            //     deleteDirection.push(val.value);
+            //     console.log(deleteDirection)
+            //     dirToDelete.value = deleteDirection;
+            // }
+            pel.parentElement.removeChild(pel);
+            let curVal = dirInput.value;
+            currentDirection--
+            dirInput.value = curVal - 1;
+        }
+    </script>
+</body>
+
+</html>
