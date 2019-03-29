@@ -7,7 +7,7 @@ const pool = new Pool({
 });
 
 function getAllFoods(callback) {
-    var getAllFoods = "select f.food_id, f.food_name, f.foodgroup_id, f.quantity_num, f.expiration, f.quantity_type_id, qt.quantity_type_name FROM foods f JOIN quantity_types qt ON qt.quantity_type_id = f.quantity_type_id ORDER BY f.expiration;"
+    var getAllFoods = "select f.food_id, f.food_name, f.foodgroup_id, f.quantity_num, f.expiration, f.quantity_type_id, qt.quantity_type_name FROM foods f JOIN quantity_types qt ON qt.quantity_type_id = f.quantity_type_id ORDER BY f.expiration"
     pool.query(getAllFoods, function (err, result) {
         if (err) {
             console.log("Error in getAllFoods query: ")
@@ -59,6 +59,17 @@ function getFoodByName(name, callback) {
     })
 }
 
+function getFoodsByUserId(id, callback) {
+    var getFoodsByUserId = "Select * from foods where user_id = $1 ORDER BY expiration";
+    pool.query(getFoodsByUserId, [id], function (err, result) {
+        if (err) {
+            console.log("Error in getFoodsByUserId query: ")
+            console.log(err);
+        }
+        callback(result.rows);
+    })
+}
+
 function updateQuantity(id, quantity) {
     var updateQuantity = "UPDATE foods SET quantity_num = $1 WHERE food_id = $2";
     pool.query(updateQuantity, [quantity, id], function (err, result) {
@@ -103,13 +114,14 @@ function deleteFood(id, callback) {
     })
 }
 
-function verifyUser(variables, callback) {
+function verifyUser(username, callback) {
     var checkUser = "SELECT * from users WHERE user_name = $1";
-    pool.query(checkUser, [variables.username], function (err, result) {
+    pool.query(checkUser, [username], function (err, result) {
         if (err) {
             console.log("Error in checkUser query: ")
             console.log(err)
         }
+        // console.log(result)
         callback(result.rows);
     })
 }
@@ -119,6 +131,17 @@ function getAllRecipes(callback) {
     pool.query(getAllRecipes, function (err, result) {
         if (err) {
             console.log("Error in checkUser query: ")
+            console.log(err)
+        }
+        callback(result.rows);
+    })
+}
+
+function getAllRecipesByUserId(id, callback) {
+    var getAllRecipesByUserId = "select * from recipes where user_id = $1 order by recipe_name";
+    pool.query(getAllRecipesByUserId, [id], function (err, result) {
+        if (err) {
+            console.log("Error in getAllRecipesByUserId query: ")
             console.log(err)
         }
         callback(result.rows);
@@ -261,6 +284,17 @@ function deleteInstruction(id, callback) {
     })
 }
 
+function insertUser(params, callback) {
+    var insertUser = "insert into users values (default, $1, $2, $3, $4, $5)";
+    pool.query(insertUser, params, function (err, result) {
+        if (err) {
+            console.log("Error in insertUser query: ")
+            console.log(err);
+        }
+        callback(result.rows);
+    })
+}
+
 module.exports = {
     getAllFoods: getAllFoods,
     getFoodById: getFoodById,
@@ -269,8 +303,10 @@ module.exports = {
     getFoodGroups: getFoodGroups,
     deleteFood: deleteFood,
     verifyUser: verifyUser,
+    getFoodsByUserId: getFoodsByUserId,
     updateQuantity: updateQuantity,
     getAllRecipes: getAllRecipes,
+    getAllRecipesByUserId: getAllRecipesByUserId,
     insertRecipe: insertRecipe,
     updateRecipe: updateRecipe,
     getAllIngredients: getAllIngredients,
@@ -282,5 +318,6 @@ module.exports = {
     insertDirection: insertDirection,
     updateInstruction: updateInstruction,
     deleteInstruction: deleteInstruction,
-    getRecipeById: getRecipeById
+    getRecipeById: getRecipeById,
+    insertUser: insertUser
 }

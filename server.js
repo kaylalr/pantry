@@ -1,6 +1,6 @@
 const express = require('express');
 const app = express();
-const url = require('url');
+// const url = require('url');
 const PORT = process.env.PORT || 5000;
 const session = require('express-session');
 let stayLoggedin = true;
@@ -73,52 +73,99 @@ app.get("/login", function (req, res) {
 });
 app.post("/login", loginPost);
 
-app.get("/food", getFood);
+app.get("/signup", function (req, res) {
+    res.render('signup');
+})
 
-app.post("/food/:id/:quantity", foodQuantityPost)
+app.post("/signup", function (req, res) {
+    let firstname = req.body.firstname;
+    let lastname = req.body.lastname;
+    let email = req.body.email;
+    let username = req.body.username;
+    let password = req.body.password;
+    const params = [
+        username,
+        firstname,
+        lastname,
+        password,
+        email
+    ]
+    // console.log(params) 
+    db.insertUser(params, function(result) {
+        let message = "Thank you for signing up! Please log in."
+        const params = {
+            message: message
+        }
+        res.render("login", params);
+    })
+})
 
-app.get("/addFood", addFoodGet)
+app.get("/food", verifyLogin, getFood);
 
-app.post("/addFood", addFoodPost);
+app.post("/food/:id/:quantity", verifyLogin, foodQuantityPost)
 
-app.get("/edit/:id", editFoodGet);
+app.get("/addFood", verifyLogin, addFoodGet)
+
+app.post("/addFood", verifyLogin, addFoodPost);
+
+app.get("/edit/:id", verifyLogin, editFoodGet);
 // SHOULD THIS BE A PUT? HOW DO YOU DO THAT?
-app.post("/edit/:id", editFoodPost);
+app.post("/edit/:id", verifyLogin, editFoodPost);
 
-app.get("/recipes", getRecipes);
+app.get("/recipes", verifyLogin, getRecipes);
 
-app.get("/recipes/:id", recipeByIdGet);
+app.get("/recipes/:id", verifyLogin, recipeByIdGet);
 
-app.get("/addRecipe", addRecipeGet);
+app.get("/addRecipe", verifyLogin, addRecipeGet);
 
-app.post("/addRecipe", addRecipePost);
+app.post("/addRecipe", verifyLogin, addRecipePost);
 
-app.get("/editRecipe/:id", editRecipeGet);
+app.get("/editRecipe/:id", verifyLogin, editRecipeGet);
 
-app.post("/editRecipe/:id", editRecipePost);
+app.post("/editRecipe/:id", verifyLogin, editRecipePost);
 
-app.get("/findFood", findFoodGet);
+app.get("/findFood", verifyLogin, findFoodGet);
 
-app.delete("/delete/:id", foodDelete);
+app.delete("/delete/:id", verifyLogin, foodDelete);
 
 app.listen(PORT, function () {
     console.log("Server is running...");
 });
 
+function verifyLogin(req, res, next) {
+    if (req.session.user || stayLoggedin == true) {
+        if (req.session.user == undefined) {
+            req.session.user = { user_id: 1,
+                user_name: 'kaylah',
+                user_firstname: 'Kayla',
+                user_lastname: 'Hellbusch',
+                user_password: 'myPassword4$',
+                user_email: 'klr3of8@gmail.com' }
+        }
+        // console.log(req.session.user)
+        next();
+    } else {
+        // var result = {success: false, message: "Didn't work"}
+        // res.status(401).json(result);
+        res.redirect("/")
+    }
+}
+
 function loginPost(req, res) {
     let username = req.body.username;
     let password = req.body.password;
-    let variables = {
-        username: username,
-        password: password
-    }
-    db.verifyUser(variables, function (result) {
+    // let variables = {
+    //     username: username,
+    //     password: password
+    // }
+    db.verifyUser(username, function (result) {
         if (result.length != 1) {
             let message = "Please check your username and password."
             let params = {
                 message: message
             }
             res.render('login', params);
+            return;
         }
         let checkPass = f.checkPassword(result[0], password);
         if (!checkPass) {
@@ -129,18 +176,22 @@ function loginPost(req, res) {
             res.render('login', params);
         } else {
             req.session.user = result[0];
-            // console.log("session username: " + req.session.user.user_name);
             res.redirect("/food");
         }
     })
 }
 
 function getFood(req, res) {
-    if (req.session.user == 'undefined' || req.session.user == null && stayLoggedin == false) {
-        res.redirect("/");
-    }
+    // if (req.session.user == 'undefined' || req.session.user == null && stayLoggedin == false) {
+    //     res.redirect("/");
+    // }
     // ??? is this the best way to do this?  look at the getAllFoods function
-    db.getAllFoods(function (result) {
+    db.getFoodsByUserId(req.session.user.user_id, function (result) {
+        let message = ""
+        if (result.length == 0) {
+            // console.log("getting here!!!");
+            message = "You have no food! <a href='/addFood'>Add Food</a> to your pantry!"
+        }        
         let today = new Date();
         result.forEach(food => {
             food["expired"] = false;
@@ -151,6 +202,7 @@ function getFood(req, res) {
             food.expiration = f.formatDate(food.expiration);
         })
         const params = {
+            message: message,
             foods: result
         };
         res.render("food", params);
@@ -164,9 +216,9 @@ function foodQuantityPost(req, res) {
 }
 
 function addFoodGet(req, res) {
-    if (req.session.user == 'undefined' || req.session.user == null && stayLoggedin == false) {
-        res.redirect("/");
-    }
+    // if (req.session.user == 'undefined' || req.session.user == null && stayLoggedin == false) {
+    //     res.redirect("/");
+    // }
     db.getQuantityTypes(function (result1) {
         db.getFoodGroups(function (result2) {
             const params = {
@@ -187,9 +239,10 @@ function addFoodPost(req, res) {
     let quantity_type = req.body.quantity_type;
     let expiration = req.body.expiration;
     let description = req.body.description;
+    let id = req.session.user.user_id;
 
-    var insertSQL = "INSERT INTO foods values (default,$1,1,$2,$3,$4,$5,$6)";
-    pool.query(insertSQL, [food_name, food_type, quantity_num, quantity_type, expiration, description], function (err, result) {
+    var insertSQL = "INSERT INTO foods values (default,$1,$7,$2,$3,$4,$5,$6)";
+    pool.query(insertSQL, [food_name, food_type, quantity_num, quantity_type, expiration, description, id], function (err, result) {
         // If an error occurred...
         if (err) {
             console.log("Error in addFood query: ")
@@ -200,9 +253,9 @@ function addFoodPost(req, res) {
 }
 
 function editFoodGet(req, res) {
-    if (req.session.user == 'undefined' || req.session.user == null && stayLoggedin == false) {
-        res.redirect("/");
-    }
+    // if (req.session.user == 'undefined' || req.session.user == null && stayLoggedin == false) {
+    //     res.redirect("/");
+    // }
     let id = req.params.id;
     db.getQuantityTypes(function (result1) {
         db.getFoodGroups(function (result2) {
@@ -251,16 +304,22 @@ function foodDelete(req, res) {
     // console.log("delete " + id);
     db.deleteFood(id, function () {
         // WHY DOESN'T THIS WORK??
+        console.log("getting to food delete")
         // res.redirect("/food");
     })
 }
 
 function getRecipes(req, res) {
-    if (req.session.user == 'undefined' || req.session.user == null && stayLoggedin == false) {
-        res.redirect("/");
-    }
-    db.getAllRecipes(function (result) {
+    // if (req.session.user == 'undefined' || req.session.user == null && stayLoggedin == false) {
+    //     res.redirect("/");
+    // }
+    db.getAllRecipesByUserId(req.session.user.user_id, function (result) {
+        let message = ""
+        if(result.length == 0) {
+            message = "You have no recipes! <a href='/addRecipe'>Add Recipes</a> to your collection!"
+        }
         const params = {
+            message: message,
             recipes: result
         }
         // console.log(params.recipes);
@@ -269,9 +328,9 @@ function getRecipes(req, res) {
 }
 
 function recipeByIdGet(req, res) {
-    if (req.session.user == 'undefined' || req.session.user == null && stayLoggedin == false) {
-        res.redirect("/");
-    }
+    // if (req.session.user == 'undefined' || req.session.user == null && stayLoggedin == false) {
+    //     res.redirect("/");
+    // }
     id = req.params.id;
     db.getRecipeById(id, function (result1) {
         db.getIngredientsByRecipeId(id, function (result2) {
@@ -291,9 +350,9 @@ function recipeByIdGet(req, res) {
 }
 
 function addRecipeGet(req, res) {
-    if (req.session.user == 'undefined' || req.session.user == null && stayLoggedin == false) {
-        res.redirect("/");
-    }
+    // if (req.session.user == 'undefined' || req.session.user == null && stayLoggedin == false) {
+    //     res.redirect("/");
+    // }
     db.getQuantityTypes(function (result) {
         const params = {
             quantity_types: result
@@ -470,9 +529,9 @@ function editRecipePost(req, res) {
 }
 
 function findFoodGet(req, res) {
-    if (req.session.user == 'undefined' || req.session.user == null && stayLoggedin == false) {
-        res.redirect("/");
-    }
+    // if (req.session.user == 'undefined' || req.session.user == null && stayLoggedin == false) {
+    //     res.redirect("/");
+    // }
     let myRecipes = [];
     // get all the foods the user has
     db.getAllFoods(function (food) {
@@ -493,6 +552,7 @@ function findFoodGet(req, res) {
                     })
                     // go through all the ingredients for the recipe
                     ingForRecipe.forEach(ing => {
+                        // let similarFoods = f.similarFood(ing.ingredient_name);
                         // find food with the same name
                         let myFood = food.find(f => f.food_name == ing.ingredient_name);
                         // if there was food with that name, check the amounts

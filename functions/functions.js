@@ -33,17 +33,6 @@ function getml(num, type) {
 }
 
 function formatDate(myDate) {
-    // let year = myDate.getFullYear();
-    // let month = myDate.getMonth() + 1;
-    // if (month.toString().length == 1) {
-    //     month = "0" + month;
-    // }
-    // let day = myDate.getDate();
-    // if (day.toString().length == 1) {
-    //     day = "0" + day;
-    // }
-    // let date = year + "-" + month + "-" + day;
-    // return date;
     let year = myDate.getFullYear();
     let month = myDate.getMonth() + 1;
     let day = myDate.getDate();
@@ -55,9 +44,20 @@ function formatDate(myDate) {
     return date;
 }
 
+let butters = ["butter", "margarine"]
+
+function similarFood(food) {
+    butters.find(function (value) {
+        if (value == food) {
+            return butters;
+        }
+    })
+}
+
 module.exports = {
     checkPassword: checkPassword,
     formatQuantity: formatQuantity,
     getml: getml,
-    formatDate
+    formatDate: formatDate,
+    similarFood: similarFood
 }

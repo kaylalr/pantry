@@ -3,6 +3,37 @@
   padding: 5.5rem 0;
 }
 
+.cookie-icon {
+  margin-bottom: 20px;
+}
+
+#modalRed {
+  background-color: #ba4c63;
+}
+
+#modalLightBlue {
+  background-color: #1fa4b6;
+  color: #495057;
+}
+
+#modalTan {
+  background-color: #ccb2a3;
+}
+
+.whatWeDoModalSmall {
+  height: 210px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.whatWeDoModalLarge {
+  height: 50vw;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
 .food-content .row:nth-child(even) {
   background-color: #f2f2f2;
 }
@@ -147,6 +178,9 @@
 }
 
 .add-ingredient-direction #ing-heading {
+  margin-top: 40px;
+}
+.add-ingredient-direction h3 {
   margin-bottom: 0;
 }
 .add-ingredient-direction button {
@@ -180,6 +214,36 @@
 .flex-row h5,
 .flex-row p {
   margin-bottom: 0px;
+}
+
+.all-recipes-content .recipe {
+  padding: 20px;
+}
+.all-recipes-content .recipe:nth-child(even) {
+  background-color: #f2f2f2;
+}
+.all-recipes-content .recipe-flex-row {
+  display: flex;
+  flex-flow: row nowrap;
+  align-items: center;
+  justify-content: space-between;
+}
+.all-recipes-content .recipe-buttons {
+  display: flex;
+  flex-flow: row nowrap;
+  justify-content: space-between;
+  align-items: center;
+}
+.all-recipes-content .recipe-buttons button {
+  margin-left: 10px;
+}
+
+#passwordMatch {
+  height: 30px;
+  width: 250px;
+  padding-left: 10px;
+  text-align: left;
+  position: absolute;
 }
 
 .width-100 {
@@ -216,9 +280,17 @@ hr.star-dark {
   margin-bottom: 2rem !important;
 }
 
+.hidden {
+  display: none;
+}
+
 @media screen and (min-width: 536px) {
   .padding-top {
     padding: 6rem 0;
+  }
+
+  .whatWeDoModalLarge {
+    height: 40vw;
   }
 
   #ingredient-list {
@@ -289,6 +361,15 @@ hr.star-dark {
 
   #instruction-list li {
     grid-template-columns: 10% 90%;
+  }
+}
+@media screen and (min-width: 1000px) {
+  .whatWeDoModalSmall {
+    height: 253px;
+  }
+
+  .whatWeDoModalLarge {
+    height: 30vw;
   }
 }
 

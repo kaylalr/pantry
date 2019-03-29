@@ -16,7 +16,8 @@
     <!-- Custom fonts for this template -->
     <link href="vendor/fontawesome-free/css/all.min.css" rel="stylesheet" type="text/css">
     <link href="https://fonts.googleapis.com/css?family=Montserrat:400,700" rel="stylesheet" type="text/css">
-    <link href="https://fonts.googleapis.com/css?family=Lato:400,700,400italic,700italic" rel="stylesheet" type="text/css">
+    <link href="https://fonts.googleapis.com/css?family=Lato:400,700,400italic,700italic" rel="stylesheet"
+        type="text/css">
 
     <!-- Plugin CSS -->
     <link href="vendor/magnific-popup/magnific-popup.css" rel="stylesheet" type="text/css">
@@ -39,18 +40,32 @@
             <h2 class="text-center text-uppercase text-secondary mb-0">My Recipes</h2>
             <hr class="star-dark mb-5">
 
+
+            <div>
+                <h4 class="text-center"><%- message%></h4>
+            </div>
             <div class="all-recipes-content">
                 <% recipes.forEach(recipe => { %>
-                <div>
-                    <a href="/recipes/<%= recipe.recipe_id%>">
-                        <h3 class="hide-small">
-                            <%= recipe.recipe_name%>
-                        </h3>
-                        <h4 class="show-small">
-                            <%= recipe.recipe_name%>
-                        </h4>
-                    </a>
-                    <p><%= recipe.author%></p>
+                <div class="recipe">
+                    <div class="recipe-flex-row">
+                        <div class="">
+                            <a href="/recipes/<%= recipe.recipe_id%>">
+                                <h3 class="hide-small">
+                                    <%= recipe.recipe_name%>
+                                </h3>
+                                <h4 class="show-small">
+                                    <%= recipe.recipe_name%>
+                                </h4>
+                            </a>
+                            <p><%= recipe.author%></p>
+                        </div>
+                        <!-- <div class="col hide-small"></div> -->
+                        <div class="recipe-buttons">
+                            <!-- <button class="btn btn-info">View</button> -->
+                            <button class="btn btn-secondary">Edit</button>
+                            <button class="btn btn-danger">Delete</button>
+                        </div>
+                    </div>
                 </div>
                 <% })%>
             </div>
