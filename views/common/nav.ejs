@@ -18,21 +18,56 @@
           <a class="nav-link py-3 px-0 px-lg-3 rounded js-scroll-trigger" href="/login">Login</a>
         </li>
         <% } else { %>
-        <li class="nav-item mx-0 mx-lg-1">
-          <a class="nav-link py-3 px-0 px-lg-3 rounded js-scroll-trigger" href="/food">Food</a>
+          <!-- for large screens -->
+        <li class="nav-item dropdown hide-sm-md">
+          <a class="nav-link py-3 px-0 px-lg-3 rounded js-scroll-trigger dropdown-toggle" href="#" id="navbarFoodDropdown" role="button" data-toggle="dropdown"
+            aria-haspopup="true" aria-expanded="false">
+            Food
+          </a>
+          <div class="dropdown-menu" aria-labelledby="navbarFoodDropdown">
+            <a class="dropdown-item" href="/food">My Food</a>
+            <a class="dropdown-item" href="/addFood">Add Food</a>
+            <!-- <div class="dropdown-divider"></div>
+            <a class="dropdown-item" href="#">Something else here</a> -->
+          </div>
         </li>
-        <li class="nav-item mx-0 mx-lg-1">
+        <li class="nav-item dropdown hide-sm-md">
+          <a class="nav-link py-3 px-0 px-lg-3 rounded js-scroll-trigger dropdown-toggle" href="#" id="navbarFoodDropdown" role="button" data-toggle="dropdown"
+            aria-haspopup="true" aria-expanded="false">
+            Recipes
+          </a>
+          <div class="dropdown-menu" aria-labelledby="navbarFoodDropdown">
+            <a class="dropdown-item" href="/recipes">My Recipes</a>
+            <a class="dropdown-item" href="/addRecipe">Add Recipe</a>
+            <!-- <div class="dropdown-divider"></div>
+            <a class="dropdown-item" href="#">Something else here</a> -->
+          </div>
+        </li>
+        <!-- For small and medium screens -->
+        <li class="nav-item mx-0 mx-lg-1 show-sm-md">
+            <a class="nav-link py-3 px-0 px-lg-3 rounded js-scroll-trigger color-primary" href="/food">Food</a>
+          </li>
+        <li class="nav-item mx-0 mx-lg-1 show-sm-md link-indent">
+          <a class="nav-link py-3 px-0 px-lg-3 rounded js-scroll-trigger" href="/food">My Food</a>
+        </li>
+        <li class="nav-item mx-0 mx-lg-1 show-sm-md link-indent">
           <a class="nav-link py-3 px-0 px-lg-3 rounded js-scroll-trigger" href="/addFood">Add Food</a>
         </li>
-        <li class="nav-item mx-0 mx-lg-1">
-          <a class="nav-link py-3 px-0 px-lg-3 rounded js-scroll-trigger" href="/recipes">Recipes</a>
+        <li class="nav-item mx-0 mx-lg-1 show-sm-md">
+          <a class="nav-link py-3 px-0 px-lg-3 rounded js-scroll-trigger color-primary" href="/recipes">Recipes</a>
         </li>
-        <li class="nav-item mx-0 mx-lg-1">
+        <li class="nav-item mx-0 mx-lg-1 show-sm-md link-indent">
+            <a class="nav-link py-3 px-0 px-lg-3 rounded js-scroll-trigger" href="/recipes">My Recipes</a>
+          </li>
+        <li class="nav-item mx-0 mx-lg-1 show-sm-md link-indent">
           <a class="nav-link py-3 px-0 px-lg-3 rounded js-scroll-trigger" href="/addRecipe">Add Recipe</a>
         </li>
         <li class="nav-item mx-0 mx-lg-1">
           <a class="nav-link py-3 px-0 px-lg-3 rounded js-scroll-trigger" href="/findFood">Find Food</a>
         </li>
+        <li class="nav-item mx-0 mx-lg-1">
+            <a class="nav-link py-3 px-0 px-lg-3 rounded js-scroll-trigger color-primary" href="/logout">Log out</a>
+          </li>
         <% } %>
 
 

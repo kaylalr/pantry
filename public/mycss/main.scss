@@ -1,4 +1,12 @@
 /*************************************************          ALL SCREENS         *************************************************/
+.link-indent {
+    padding-left: 30px;
+    a.py-3 {
+        padding-top: 0px!important;
+        // padding-bottom: 5px;
+    }
+}
+
 .padding-top {
     padding: 5.5rem 0;
 }
@@ -309,6 +317,14 @@
     display: initial;
 }
 
+.hide-sm-md {
+    display: none;
+}
+
+.show-sm-md {
+    display: initial;
+}
+
 .warning {
     color: red;
     padding: 15px;
@@ -436,6 +452,14 @@ hr.star-dark {
 @media screen and (min-width: 992px) {
     .padding-top {
         padding-top: 150px;
+    }
+
+    .hide-sm-md {
+        display: initial;
+    }
+
+    .show-sm-md {
+        display: none;
     }
 
     .food-content {

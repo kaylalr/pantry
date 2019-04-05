@@ -156,6 +156,7 @@
         $("#myModal").modal();
       });
       $("#yes-delete").click(function () {
+        console.log(foodId);
         var xhttp = new XMLHttpRequest();
         xhttp.onreadystatechange = function () {
           if (this.readyState == 4 && this.status == 200) {
@@ -165,6 +166,7 @@
         xhttp.open("DELETE", "/delete/" + foodId, true);
         xhttp.send();
         // reload the page so the deleted item goes away
+        // MOVE THIS TO UDER $("#myModal").modal("hide");
         window.location.reload();
       })
       $(".add-food").click(function () {
@@ -178,6 +180,7 @@
       });
       $(".subtract-food").click(function () {
         if (currentQuantity == 1) {
+          setInfo(foodAddSub);
           $("#myModal").modal();
         } else {
           id = foodAddSub + "-quantity";

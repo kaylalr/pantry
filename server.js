@@ -3,7 +3,7 @@ const app = express();
 // const url = require('url');
 const PORT = process.env.PORT || 5000;
 const session = require('express-session');
-let stayLoggedin = true;
+let stayLoggedin = false;
 
 const {
     Pool
@@ -15,7 +15,11 @@ const pool = new Pool({
 });
 
 const db = require('./model/databaseConnect.js');
-const f = require('./functions/functions.js');
+const fdb = require('./model/foodDatabaseConnect.js');
+const rdb = require('./model/recipeDatabaseConnect.js');
+const functions = require('./functions/functions.js');
+// const foodFunctions = require('./functions/foodFunctions.js');
+// const recipeFunctions = require('./functions/recipeFunctions.js');
 
 app.use(session({
     // cookieName: 'session',
@@ -78,6 +82,7 @@ app.get("/signup", function (req, res) {
 })
 
 app.post("/signup", function (req, res) {
+
     let firstname = req.body.firstname;
     let lastname = req.body.lastname;
     let email = req.body.email;
@@ -90,13 +95,25 @@ app.post("/signup", function (req, res) {
         password,
         email
     ]
-    // console.log(params) 
-    db.insertUser(params, function(result) {
-        let message = "Thank you for signing up! Please log in."
-        const params = {
-            message: message
+
+    // check if the username is already being used
+    db.verifyUser(username, function(result) {
+        // console.log(result.length);
+        if(result.length == 1) {
+            let message = "That username is already in use. Please choose a different one."
+            const params = {
+                message: message
+            }
+            res.render('signup', params)
+        } else {
+            db.insertUser(params, function(result) {
+                let message = "Thank you for signing up! Please log in."
+                const params = {
+                    message: message
+                }
+                res.render("login", params);
+            })
         }
-        res.render("login", params);
     })
 })
 
@@ -127,6 +144,13 @@ app.post("/editRecipe/:id", verifyLogin, editRecipePost);
 app.get("/findFood", verifyLogin, findFoodGet);
 
 app.delete("/delete/:id", verifyLogin, foodDelete);
+
+app.get("/logout", function(req, res) {
+    req.session.destroy();
+    res.locals.user = undefined;
+    res.locals.loggedin = false;
+    res.redirect("/")
+});
 
 app.listen(PORT, function () {
     console.log("Server is running...");
@@ -167,7 +191,7 @@ function loginPost(req, res) {
             res.render('login', params);
             return;
         }
-        let checkPass = f.checkPassword(result[0], password);
+        let checkPass = functions.checkPassword(result[0], password);
         if (!checkPass) {
             let message = "Please check your username and password."
             let params = {
@@ -186,7 +210,7 @@ function getFood(req, res) {
     //     res.redirect("/");
     // }
     // ??? is this the best way to do this?  look at the getAllFoods function
-    db.getFoodsByUserId(req.session.user.user_id, function (result) {
+    fdb.getFoodsByUserId(req.session.user.user_id, function (result) {
         let message = ""
         if (result.length == 0) {
             // console.log("getting here!!!");
@@ -199,7 +223,7 @@ function getFood(req, res) {
                 food.expired = true;
             }
             // console.log("Expired: " + food.expired);
-            food.expiration = f.formatDate(food.expiration);
+            food.expiration = functions.formatDate(food.expiration);
         })
         const params = {
             message: message,
@@ -212,15 +236,15 @@ function getFood(req, res) {
 function foodQuantityPost(req, res) {
     let id = req.params.id;
     let quantity = req.params.quantity;
-    db.updateQuantity(id, quantity);
+    fdb.updateQuantity(id, quantity);
 }
 
 function addFoodGet(req, res) {
     // if (req.session.user == 'undefined' || req.session.user == null && stayLoggedin == false) {
     //     res.redirect("/");
     // }
-    db.getQuantityTypes(function (result1) {
-        db.getFoodGroups(function (result2) {
+    fdb.getQuantityTypes(function (result1) {
+        fdb.getFoodGroups(function (result2) {
             const params = {
                 quantity_types: result1,
                 food_groups: result2
@@ -257,11 +281,11 @@ function editFoodGet(req, res) {
     //     res.redirect("/");
     // }
     let id = req.params.id;
-    db.getQuantityTypes(function (result1) {
-        db.getFoodGroups(function (result2) {
-            db.getFoodById(id, function (result3) {
+    fdb.getQuantityTypes(function (result1) {
+        fdb.getFoodGroups(function (result2) {
+            fdb.getFoodById(id, function (result3) {
                 // result3.forEach(food => {
-                //     food.expiration = f.formatDate(food.expiration);
+                //     food.expiration = functions.formatDate(food.expiration);
                 //     cosole.log(food.expiration);
                 // })
                 const params = {
@@ -302,7 +326,7 @@ function editFoodPost(req, res) {
 function foodDelete(req, res) {
     let id = req.params.id;
     // console.log("delete " + id);
-    db.deleteFood(id, function () {
+    fdb.deleteFood(id, function () {
         // WHY DOESN'T THIS WORK??
         console.log("getting to food delete")
         // res.redirect("/food");
@@ -313,7 +337,7 @@ function getRecipes(req, res) {
     // if (req.session.user == 'undefined' || req.session.user == null && stayLoggedin == false) {
     //     res.redirect("/");
     // }
-    db.getAllRecipesByUserId(req.session.user.user_id, function (result) {
+    rdb.getAllRecipesByUserId(req.session.user.user_id, function (result) {
         let message = ""
         if(result.length == 0) {
             message = "You have no recipes! <a href='/addRecipe'>Add Recipes</a> to your collection!"
@@ -332,11 +356,11 @@ function recipeByIdGet(req, res) {
     //     res.redirect("/");
     // }
     id = req.params.id;
-    db.getRecipeById(id, function (result1) {
-        db.getIngredientsByRecipeId(id, function (result2) {
-            db.getInstructionsByRecipeId(id, function (result3) {
+    rdb.getRecipeById(id, function (result1) {
+        rdb.getIngredientsByRecipeId(id, function (result2) {
+            rdb.getInstructionsByRecipeId(id, function (result3) {
                 result2.forEach(num => {
-                    num.quantity_num = f.formatQuantity(num.quantity_num);
+                    num.quantity_num = functions.formatQuantity(num.quantity_num);
                 })
                 const params = {
                     recipe: result1,
@@ -353,7 +377,7 @@ function addRecipeGet(req, res) {
     // if (req.session.user == 'undefined' || req.session.user == null && stayLoggedin == false) {
     //     res.redirect("/");
     // }
-    db.getQuantityTypes(function (result) {
+    fdb.getQuantityTypes(function (result) {
         const params = {
             quantity_types: result
         }
@@ -372,7 +396,7 @@ function addRecipePost(req, res) {
     // console.log(params);
     const recipeParams = [req.body.recipe_name, req.body.author, 1];
     console.log(recipeParams)
-    db.insertRecipe(recipeParams, function (result) {
+    rdb.insertRecipe(recipeParams, function (result) {
         console.log("id: " + result.rows[0].recipe_id);
         let recipe_id = result.rows[0].recipe_id;
         let insertedDirections = false;
@@ -389,7 +413,7 @@ function addRecipePost(req, res) {
             ];
             // console.log("ingredients params:")
             // console.log(ingParams);
-            db.insertIngredient(ingParams, function () {
+            rdb.insertIngredient(ingParams, function () {
                 if (insertedDirections == false) {
                     insertedDirections = true;
                     let directions = req.body.direction
@@ -401,7 +425,7 @@ function addRecipePost(req, res) {
                         ]
                         // console.log("dir params:")
                         // console.log(dirParams)
-                        db.insertDirection(dirParams, function () {
+                        rdb.insertDirection(dirParams, function () {
                             // console.log("current: "+curIng+", "+curDir);
                             // if((i+1) == ingNum && (j+1) == dirNum) {
                             //     res.redirect("/recipes");
@@ -418,10 +442,10 @@ function addRecipePost(req, res) {
 
 function editRecipeGet(req, res) {
     id = req.params.id;
-    db.getRecipeById(id, function (recipe) {
-        db.getIngredientsByRecipeId(id, function (ing) {
-            db.getInstructionsByRecipeId(id, function (ins) {
-                db.getQuantityTypes(function (types) {
+    rdb.getRecipeById(id, function (recipe) {
+        rdb.getIngredientsByRecipeId(id, function (ing) {
+            rdb.getInstructionsByRecipeId(id, function (ins) {
+                fdb.getQuantityTypes(function (types) {
                     const params = {
                         recipe: recipe,
                         ingredients: ing,
@@ -479,7 +503,7 @@ function editRecipePost(req, res) {
     let dirOrder = req.body.instructionNumber;
 
     const recipeParams = [id, req.body.recipe_name, req.body.author, 1];
-    db.updateRecipe(recipeParams, function (result) {
+    rdb.updateRecipe(recipeParams, function (result) {
         for (i = 0; i < ingNum.length; i++) {
             let ingParams = [
                 id,
@@ -490,7 +514,7 @@ function editRecipePost(req, res) {
             ];
             console.log("ingParams: ");
             console.log(ingParams);
-            db.updateIngredient(ingParams, function () {})
+            rdb.updateIngredient(ingParams, function () {})
         }
         for (i = ingNum.length; i < ingTotal; i++) {
             let params = [
@@ -499,10 +523,10 @@ function editRecipePost(req, res) {
                 q_nums[i],
                 q_types[i]
             ];
-            db.insertIngredient(params, function () {})
+            rdb.insertIngredient(params, function () {})
         }
         for (i = 0; i < ingDeleteId.length; i++) {
-            db.deleteIngredient(ingDeleteId[i], function () {})
+            rdb.deleteIngredient(ingDeleteId[i], function () {})
         }
         for (i = 0; i < dirNum.length; i++) {
             let params = [
@@ -511,7 +535,7 @@ function editRecipePost(req, res) {
                 dirSteps[i],
                 dirOrder[i]
             ]
-            db.updateInstruction(params, function () {})
+            rdb.updateInstruction(params, function () {})
         }
         for (i = dirNum.length; i < dirTotal; i++) {
             let params = [
@@ -519,10 +543,10 @@ function editRecipePost(req, res) {
                 dirSteps[i],
                 dirOrder[i]
             ]
-            db.insertDirection(params, function () {})
+            rdb.insertDirection(params, function () {})
         }
         for (i = 0; i < dirDeleteId.length; i++) {
-            db.deleteInstruction(dirDeleteId[i], function () {})
+            rdb.deleteInstruction(dirDeleteId[i], function () {})
         }
         res.redirect("/recipes/" + id);
     })
@@ -534,11 +558,11 @@ function findFoodGet(req, res) {
     // }
     let myRecipes = [];
     // get all the foods the user has
-    db.getAllFoods(function (food) {
+    fdb.getAllFoods(function (food) {
         // get all the recipes for the user
-        db.getAllRecipes(function (recipes) {
+        rdb.getAllRecipes(function (recipes) {
             // get all the ingredients for all recipes
-            db.getAllIngredients(function (ingredients) {
+            rdb.getAllIngredients(function (ingredients) {
                 // go through each recipe
                 recipes.forEach(recipe => {
                     let ingForRecipe = [];
@@ -552,13 +576,13 @@ function findFoodGet(req, res) {
                     })
                     // go through all the ingredients for the recipe
                     ingForRecipe.forEach(ing => {
-                        // let similarFoods = f.similarFood(ing.ingredient_name);
+                        // let similarFoods = functions.similarFood(ing.ingredient_name);
                         // find food with the same name
                         let myFood = food.find(f => f.food_name == ing.ingredient_name);
                         // if there was food with that name, check the amounts
                         if (myFood != undefined) {
-                            foodNum = f.getml(myFood.quantity_num, myFood.quantity_type_id);
-                            ingNum = f.getml(ing.quantity_num, ing.quantity_type);
+                            foodNum = functions.getml(myFood.quantity_num, myFood.quantity_type_id);
+                            ingNum = functions.getml(ing.quantity_num, ing.quantity_type);
                             // if the amount of food is greater than or equal to the amount in the recipe, add it to an array
                             if (+foodNum >= +ingNum) {
                                 enoughFood.push(myFood);
