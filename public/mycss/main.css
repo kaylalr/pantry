@@ -115,7 +115,6 @@
 #instruction-list li {
   display: grid;
   grid-template-columns: 25% 75%;
-  margin-top: 10px;
   padding: 15px;
 }
 #instruction-list li:nth-child(even) {
@@ -282,7 +281,11 @@
   color: red;
 }
 
-.click-underline:active {
+.click-underline {
+  width: fit-content;
+}
+.click-underline:active, .click-underline:hover {
+  cursor: pointer;
   text-decoration: underline;
 }
 

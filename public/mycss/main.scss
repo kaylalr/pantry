@@ -335,7 +335,9 @@
 }
 
 .click-underline {
-    &:active {
+    width: fit-content;
+    &:active, &:hover {
+        cursor: pointer;
         text-decoration: underline;
     }
 }
