@@ -4,7 +4,6 @@ create table users (
     user_firstname  varchar(100)    not null,
     user_lastname   varchar(100)    not null,
     user_password   varchar(100)    not null,
-    user_email      varchar(50)     not null,
     primary key (user_id)
 );
 
@@ -81,7 +80,14 @@ create table recipes (
     author      varchar(100),
     user_id     int     not null,
     primary key (recipe_id),
-    foreign key (user_id) REFERENCES users(user_id);
+    foreign key (user_id) REFERENCES users(user_id)
+);
+
+insert into recipes values (
+    default,
+    'Hamburgers',
+    'Kayla Hellbusch',
+    1
 );
 
 create table ingredients (
@@ -102,7 +108,6 @@ create table instructions (
     primary key (instruction_id),
     foreign key (recipe_id) REFERENCES recipes(recipe_id)
 );
-
 
 insert into ingredients values (
     default,
