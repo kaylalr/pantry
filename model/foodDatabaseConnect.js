@@ -1,9 +1,12 @@
 const {
     Pool
 } = require('pg')
-const connectionString = process.env.DATABASE_URL || "postgres://kwyatgkxstrdfg:c6f7f83e42450a3bc336092853545e287cde8e1d97e1184e3bcfefb963e5372c@ec2-54-225-95-183.compute-1.amazonaws.com:5432/dcieu6j73u775s?ssl=true"
+const connectionString = process.env.DATABASE_URL || "postgres://mbwomgmoqbepza:966aeb81a74e1d7966e4fde69c75a42941b5bbf39567cb25c73341f64e0a44d7@ec2-34-195-169-25.compute-1.amazonaws.com:5432/dl7jseb2e0n12"
 const pool = new Pool({
-    connectionString: connectionString
+    connectionString: connectionString,
+    ssl: {
+        rejectUnauthorized: false
+    }
 });
 
 // function addFood
@@ -68,6 +71,7 @@ function getFoodsByUserId(id, callback) {
             console.log("Error in getFoodsByUserId query: ")
             console.log(err);
         }
+        console.log('rows', result.rows)
         callback(result.rows);
     })
 }
