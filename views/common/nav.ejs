@@ -65,9 +65,24 @@
         <li class="nav-item mx-0 mx-lg-1">
           <a class="nav-link py-3 px-0 px-lg-3 rounded js-scroll-trigger" href="/findFood">Find Food</a>
         </li>
-        <li class="nav-item mx-0 mx-lg-1">
-            <a class="nav-link py-3 px-0 px-lg-3 rounded js-scroll-trigger color-primary" href="/logout">Log out</a>
-          </li>
+        <li class="nav-item mx-0 mx-lg-1 show-sm-md">
+          <a class="nav-link py-3 px-0 px-lg-3 rounded js-scroll-trigger color-primary" href="/account">My account</a>
+        </li>
+        <li class="nav-item mx-0 mx-lg-1 show-sm-md">
+          <a class="nav-link py-3 px-0 px-lg-3 rounded js-scroll-trigger color-primary" href="/logout">Log out</a>
+        </li>
+        <li class="nav-item dropdown hide-sm-md">
+          <a class="nav-link py-3 px-0 px-lg-3 rounded js-scroll-trigger dropdown-toggle" href="#" id="navbarFoodDropdown" role="button" data-toggle="dropdown"
+            aria-haspopup="true" aria-expanded="false">
+            Account
+          </a>
+          <div class="dropdown-menu" aria-labelledby="navbarFoodDropdown">
+            <a class="dropdown-item" href="/account">My Account</a>
+            <a class="dropdown-item" href="/logout">Log out</a>
+            <!-- <div class="dropdown-divider"></div>
+            <a class="dropdown-item" href="#">Something else here</a> -->
+          </div>
+        </li>
         <% } %>
 
 

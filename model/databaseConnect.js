@@ -136,6 +136,19 @@ function verifyUser(username, callback) {
     })
 }
 
+function updateUser(params, callback) {
+    var checkUser = "UPDATE users set user_firstname=$2, user_lastname=$3, user_name=$4 WHERE user_id=$1";
+    // var checkUser = "SELECT * from users";
+    pool.query(checkUser, params, function (err, result) {
+        if (err) {
+            console.log("Error in checkUser query: ")
+            console.log(err)
+        }
+        // console.log(result)
+        callback(result);
+    })
+}
+
 // function getAllRecipes(callback) {
 //     var getAllRecipes = "select * from recipes order by recipe_name";
 //     pool.query(getAllRecipes, function (err, result) {
@@ -329,5 +342,6 @@ module.exports = {
     // updateInstruction: updateInstruction,
     // deleteInstruction: deleteInstruction,
     // getRecipeById: getRecipeById,
-    insertUser: insertUser
+    insertUser: insertUser,
+    updateUser: updateUser,
 }

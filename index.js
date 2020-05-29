@@ -3,7 +3,7 @@ const app = express();
 // const url = require('url');
 const PORT = process.env.PORT || 5000;
 const session = require('express-session');
-let stayLoggedin = false;
+let stayLoggedin = true;
 
 const {
     Pool
@@ -157,11 +157,42 @@ app.get("/logout", verifyLogin, function(req, res) {
 });
 
 app.get("/account", verifyLogin, function (req, res) {
-    res.render('account');
+    const params = {
+        firstName: req.session.user.user_firstname,
+        lastName: req.session.user.user_lastname,
+        username: req.session.user.user_name,
+    };
+    res.render('account', params);
 })
 
-app.get("/account/edit", verifyLogin, function (req, res) {
-    res.render('accountEdit');
+app.post("/accountUpdate", verifyLogin, function (req, res) {
+    let userId = req.session.user.user_id;
+    const queryParams = [
+        userId,
+        req.body.firstname,
+        req.body.lastname,
+        req.body.username
+    ]
+    db.updateUser(queryParams, (result) => {
+        console.log(result)
+        if (result.rowCount !== 1) {
+            const params = {
+                firstName: req.session.user.user_firstname,
+                lastName: req.session.user.user_lastname,
+                username: req.session.user.user_name,
+                message: "Something went wrong. Please try again.",
+            };
+            res.render('account', params);
+        } else {
+            const params = {
+                firstName: req.body.firstname,
+                lastName: req.body.lastname,
+                username: req.body.username,
+                message: 'Your account was successfully updated.',
+            };
+            res.render('account', params);
+        }
+    })
 })
 
 app.listen(PORT, function () {
@@ -171,18 +202,16 @@ app.listen(PORT, function () {
 function verifyLogin(req, res, next) {
     if (req.session.user || stayLoggedin == true) {
         if (req.session.user == undefined) {
-            req.session.user = { user_id: 1,
+            req.session.user = { 
+                user_id: 2,
                 user_name: 'kaylah',
                 user_firstname: 'Kayla',
                 user_lastname: 'Hellbusch',
-                user_password: 'myPassword4$',
-                user_email: 'klr3of8@gmail.com' }
+                user_password: 'soccorrox'
+            }
         }
-        // console.log(req.session.user)
         next();
     } else {
-        // var result = {success: false, message: "Didn't work"}
-        // res.status(401).json(result);
         res.redirect("/")
     }
 }
@@ -232,6 +261,7 @@ function getFood(req, res) {
             message: message,
             foods: result
         };
+        console.log(params)
         res.render("food", params);
     })
 }
