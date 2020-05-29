@@ -9,9 +9,13 @@ const {
     Pool
 } = require('pg')
 
-const connectionString = process.env.DATABASE_URL || "postgres://kwyatgkxstrdfg:c6f7f83e42450a3bc336092853545e287cde8e1d97e1184e3bcfefb963e5372c@ec2-54-225-95-183.compute-1.amazonaws.com:5432/dcieu6j73u775s?ssl=true"
+// const connectionString = process.env.DATABASE_URL || "postgres://kwyatgkxstrdfg:c6f7f83e42450a3bc336092853545e287cde8e1d97e1184e3bcfefb963e5372c@ec2-54-225-95-183.compute-1.amazonaws.com:5432/dcieu6j73u775s?ssl=true"
+const connectionString = process.env.DATABASE_URL || "postgres://mbwomgmoqbepza:966aeb81a74e1d7966e4fde69c75a42941b5bbf39567cb25c73341f64e0a44d7@ec2-34-195-169-25.compute-1.amazonaws.com:5432/dl7jseb2e0n12"
 const pool = new Pool({
-    connectionString: connectionString
+    connectionString: connectionString,
+    ssl: {
+        rejectUnauthorized: false
+    }
 });
 
 const db = require('./model/databaseConnect.js');
@@ -145,12 +149,20 @@ app.get("/findFood", verifyLogin, findFoodGet);
 
 app.delete("/delete/:id", verifyLogin, foodDelete);
 
-app.get("/logout", function(req, res) {
+app.get("/logout", verifyLogin, function(req, res) {
     req.session.destroy();
     res.locals.user = undefined;
     res.locals.loggedin = false;
     res.redirect("/")
 });
+
+app.get("/account", verifyLogin, function (req, res) {
+    res.render('account');
+})
+
+app.get("/account/edit", verifyLogin, function (req, res) {
+    res.render('accountEdit');
+})
 
 app.listen(PORT, function () {
     console.log("Server is running...");
@@ -178,10 +190,6 @@ function verifyLogin(req, res, next) {
 function loginPost(req, res) {
     let username = req.body.username;
     let password = req.body.password;
-    // let variables = {
-    //     username: username,
-    //     password: password
-    // }
     db.verifyUser(username, function (result) {
         if (result.length != 1) {
             let message = "Please check your username and password."
@@ -206,14 +214,10 @@ function loginPost(req, res) {
 }
 
 function getFood(req, res) {
-    // if (req.session.user == 'undefined' || req.session.user == null && stayLoggedin == false) {
-    //     res.redirect("/");
-    // }
     // ??? is this the best way to do this?  look at the getAllFoods function
     fdb.getFoodsByUserId(req.session.user.user_id, function (result) {
         let message = ""
         if (result.length == 0) {
-            // console.log("getting here!!!");
             message = "You have no food! <a href='/addFood'>Add Food</a> to your pantry!"
         }        
         let today = new Date();
@@ -222,7 +226,6 @@ function getFood(req, res) {
             if (today > food.expiration) {
                 food.expired = true;
             }
-            // console.log("Expired: " + food.expired);
             food.expiration = functions.formatDate(food.expiration);
         })
         const params = {
@@ -240,16 +243,12 @@ function foodQuantityPost(req, res) {
 }
 
 function addFoodGet(req, res) {
-    // if (req.session.user == 'undefined' || req.session.user == null && stayLoggedin == false) {
-    //     res.redirect("/");
-    // }
     fdb.getQuantityTypes(function (result1) {
         fdb.getFoodGroups(function (result2) {
             const params = {
                 quantity_types: result1,
                 food_groups: result2
             };
-            // console.log(params);
             res.render("addFood", params);
         })
 
@@ -277,23 +276,15 @@ function addFoodPost(req, res) {
 }
 
 function editFoodGet(req, res) {
-    // if (req.session.user == 'undefined' || req.session.user == null && stayLoggedin == false) {
-    //     res.redirect("/");
-    // }
     let id = req.params.id;
     fdb.getQuantityTypes(function (result1) {
         fdb.getFoodGroups(function (result2) {
             fdb.getFoodById(id, function (result3) {
-                // result3.forEach(food => {
-                //     food.expiration = functions.formatDate(food.expiration);
-                //     cosole.log(food.expiration);
-                // })
                 const params = {
                     food: result3[0],
                     quantity_types: result1,
                     food_groups: result2
                 };
-                // console.log(params);
                 res.render("editFood", params);
             })
         })
@@ -310,22 +301,18 @@ function editFoodPost(req, res) {
     let expiration = req.body.expiration;
     let description = req.body.description;
 
-    // console.log("post edit id: " + id);
-
     var updateFoodSQL = "UPDATE foods SET food_name = $1, foodgroup_id = $2, quantity_num = $3, quantity_type_id = $4, expiration = $5, description = $6 WHERE food_id = $7";
     pool.query(updateFoodSQL, [food_name, food_type, quantity_num, quantity_type, expiration, description, id], function (err, result) {
         if (err) {
             console.log("Error in update food query: ")
             console.log(err);
         }
-        // how to re-route to /food - I think this works.
         res.redirect("/food");
     })
 }
 
 function foodDelete(req, res) {
     let id = req.params.id;
-    // console.log("delete " + id);
     fdb.deleteFood(id, function () {
         // WHY DOESN'T THIS WORK??
         console.log("getting to food delete")
@@ -334,9 +321,6 @@ function foodDelete(req, res) {
 }
 
 function getRecipes(req, res) {
-    // if (req.session.user == 'undefined' || req.session.user == null && stayLoggedin == false) {
-    //     res.redirect("/");
-    // }
     rdb.getAllRecipesByUserId(req.session.user.user_id, function (result) {
         let message = ""
         if(result.length == 0) {
@@ -346,15 +330,11 @@ function getRecipes(req, res) {
             message: message,
             recipes: result
         }
-        // console.log(params.recipes);
         res.render("recipes", params);
     })
 }
 
 function recipeByIdGet(req, res) {
-    // if (req.session.user == 'undefined' || req.session.user == null && stayLoggedin == false) {
-    //     res.redirect("/");
-    // }
     id = req.params.id;
     rdb.getRecipeById(id, function (result1) {
         rdb.getIngredientsByRecipeId(id, function (result2) {
@@ -374,9 +354,6 @@ function recipeByIdGet(req, res) {
 }
 
 function addRecipeGet(req, res) {
-    // if (req.session.user == 'undefined' || req.session.user == null && stayLoggedin == false) {
-    //     res.redirect("/");
-    // }
     fdb.getQuantityTypes(function (result) {
         const params = {
             quantity_types: result
@@ -391,9 +368,6 @@ function addRecipePost(req, res) {
     let dirCount = req.body.instructionNumber;
     var curIng = 0;
     let curDir = 0;
-    //const params = [ingNum, dirNum]
-    // console.log("add recipe params:");
-    // console.log(params);
     const recipeParams = [req.body.recipe_name, req.body.author, 1];
     console.log(recipeParams)
     rdb.insertRecipe(recipeParams, function (result) {
@@ -411,8 +385,6 @@ function addRecipePost(req, res) {
                 q_nums[i],
                 q_types[i]
             ];
-            // console.log("ingredients params:")
-            // console.log(ingParams);
             rdb.insertIngredient(ingParams, function () {
                 if (insertedDirections == false) {
                     insertedDirections = true;
@@ -423,8 +395,6 @@ function addRecipePost(req, res) {
                             directions[j],
                             dirCount[i]
                         ]
-                        // console.log("dir params:")
-                        // console.log(dirParams)
                         rdb.insertDirection(dirParams, function () {
                             // console.log("current: "+curIng+", "+curDir);
                             // if((i+1) == ingNum && (j+1) == dirNum) {
@@ -469,17 +439,12 @@ function editRecipePost(req, res) {
     let ingDelete = req.body.ingDelete;
     let ingDeleteId = ingDelete.split(",");
 
-    console.log("ingNum: " + ingNum);
-    console.log(typeof ingNum);
-
-    // need this for same reason as: if(typeof dirNum =='string')
+    // need this for same reason as: if(typeof dirNum =='string') - see below
     if (typeof ingNum == 'string') {
         ingNum = [ingNum];
     }
-    // console.log(typeof ingNames)
     if (typeof ingNames == 'string') {
         ingNames = [ingNames, ""]
-        // console.log("ingNames: ")
         console.log(typeof ingNames)
 
     }
@@ -553,9 +518,6 @@ function editRecipePost(req, res) {
 }
 
 function findFoodGet(req, res) {
-    // if (req.session.user == 'undefined' || req.session.user == null && stayLoggedin == false) {
-    //     res.redirect("/");
-    // }
     let myRecipes = [];
     // get all the foods the user has
     fdb.getAllFoods(function (food) {
